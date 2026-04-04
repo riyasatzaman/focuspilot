@@ -1,10 +1,8 @@
-# FocusPilot 🎮
+# Focus Pilot - Productivity Wingman
 
-**Gamified productivity — level up your life.**
+**Gamified productivity system to level up your life.**
 
 FocusPilot is a retro-style productivity app that turns your daily focus sessions into an RPG experience. Earn XP, level up your pilot, unlock rewards, and stay on track with a built-in Pomodoro timer, countdown events, and rich notes — all wrapped in a sleek pixel-art aesthetic.
-
-🔗 **Live Demo:** [focuspilot.vercel.app](https://focuspilot.vercel.app)
 
 ---
 
@@ -17,13 +15,13 @@ FocusPilot is a retro-style productivity app that turns your daily focus session
 - Live countdown bubble on the home screen while a session is active
 - Session history with a 7-day focus chart
 
-### 🧑‍✈️ Pilot & Progression System
+### Pilot & Progression System
 - Earn XP and level up your pixel-art pilot mascot
 - 5 stats: Strength, Skills, Intelligence, Vitality, Senses
 - Stats grow based on the categories of tasks you complete
 - XP bar, level titles, and animated stat flash on gain
 
-### ✅ Task Manager
+### Task Manager
 - Add tasks with notes and category tags
 - Drag-and-drop manual reordering
 - Time-spent tracking (focus sessions only, not breaks)
@@ -39,22 +37,11 @@ FocusPilot is a retro-style productivity app that turns your daily focus session
 - Colour-tagged notes with live preview
 - Sort by last edited or date created
 
-### 🎵 Lo-Fi Music Engine
-- 5 fully procedural lo-fi tracks — no copyright, generated via Web Audio API
-- Spinning record player button on the home screen
-- Track name appears on click, disappears after 3 seconds
-- Volume control and per-sound toggles in settings
-
 ### ⭐ Reward Shop
 - Create custom rewards with point costs
 - Redeem points earned from tasks and focus sessions
 - Confetti burst animation on redemption
 
-### 🎨 UI & Polish
-- Dark and light theme with animated sun/moon toggle
-- Retro pixel mascot with wobble animation and random dialogue
-- Satisfying retro click sound on every button press
-- Fully responsive within a 390px app shell
 
 ---
 
