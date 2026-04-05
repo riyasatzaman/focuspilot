@@ -320,7 +320,7 @@ export default function SettingsScreen() {
 
             {/* Mascot */}
             <div style={{ marginBottom:18, animation:'fp-gentle-float 2.8s ease-in-out infinite' }}>
-              <PilotDuck level={level} size={56} />
+              <PilotDuck level={level} size={76} />
             </div>
 
             {/* Heartfelt message */}
