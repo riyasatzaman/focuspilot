@@ -11,6 +11,7 @@ import NotificationsScreen from './screens/NotificationsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import LofiController from './components/LofiController';
 import PomoController from './components/PomoController';
+import Onboarding from './components/Onboarding';
 import { Sounds } from './utils/sounds';
 
 const SCREENS: Record<string, React.ComponentType> = {
@@ -26,8 +27,9 @@ const SCREENS: Record<string, React.ComponentType> = {
 };
 
 export default function App() {
-  const screen = useStore((s) => s.screen);
-  const theme  = useStore((s) => s.theme);
+  const screen             = useStore((s) => s.screen);
+  const theme              = useStore((s) => s.theme);
+  const hasSeenOnboarding  = useStore((s) => s.hasSeenOnboarding);
   const Screen = SCREENS[screen] ?? HomeScreen;
 
   const sounds = useStore((s) => s.sounds);
@@ -58,6 +60,7 @@ export default function App() {
     <>
       <LofiController />
       <PomoController />
+      {!hasSeenOnboarding && <Onboarding />}
       <div style={{
         background: 'var(--bg)',
         color: 'var(--text)',

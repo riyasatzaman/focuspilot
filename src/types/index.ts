@@ -99,4 +99,7 @@ export interface AppState {
   // Navigation
   screen: string;
   activeNoteId: number | null;
+
+  // Onboarding
+  hasSeenOnboarding: boolean;
 }

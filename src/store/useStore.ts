@@ -49,6 +49,7 @@ interface StoreActions {
   setLofiEnabled: (v: boolean) => void;
   setLofiTrack: (v: number) => void;
   replaceState: (data: AppState) => void;
+  setHasSeenOnboarding: (v: boolean) => void;
 }
 
 type Store = AppState & StoreActions;
@@ -138,6 +139,7 @@ export const useStore = create<Store>()(
       lofiTrack: 0,
       screen: 'home',
       activeNoteId: null,
+      hasSeenOnboarding: false,
 
       // ── Navigation ────────────────────────────────────────────────────
       setScreen: (screen) => set({ screen }),
@@ -409,7 +411,11 @@ export const useStore = create<Store>()(
         lofiTrack: data.lofiTrack,
         pomoRunning: false,
         activeNoteId: null,
+        hasSeenOnboarding: true,
       }),
+
+      // ── Onboarding ────────────────────────────────────────────────────
+      setHasSeenOnboarding: (v) => set({ hasSeenOnboarding: v }),
     }),
     { name: STORAGE_KEY },
   ),
