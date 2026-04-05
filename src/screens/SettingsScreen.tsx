@@ -4,7 +4,14 @@ import { Sounds } from '../utils/sounds';
 import { LOFI_TRACKS } from '../utils/lofi';
 import { exportBackup, validateBackup } from '../utils/backup';
 import Toast from '../components/Toast';
+import PilotDuck from '../components/PilotDuck';
 import type { AppState } from '../types';
+
+// ── Feedback config — replace with real URLs before launch ───────────────────
+const FEEDBACK_FORM_URL = 'https://forms.gle/REPLACE_ME';
+const SUPPORT_EMAIL     = 'supportfocuspilot@gmail.com';
+const SUPPORT_SUBJECT   = 'Focus Pilot Support';
+const SUPPORT_BODY      = 'Hi Focus Pilot team,\n\n';
 
 type Tab = 'general' | 'sounds' | 'focus' | 'feedback';
 
@@ -28,7 +35,7 @@ export default function SettingsScreen() {
   const {
     sounds, notifs, volume, focusDur, breakDur, focusInt, longBreakDur,
     sndFocus, sndBreak, sndLevelUp, sndXp, sndTask,
-    theme, lofiEnabled, lofiTrack,
+    theme, lofiEnabled, lofiTrack, level,
     setSounds, setNotifs, setVolume, setFocusDur, setBreakDur, setFocusInt, setLongBreakDur,
     setSndFocus, setSndBreak, setSndLevelUp, setSndXp, setSndTask,
     toggleTheme, setScreen, setLofiEnabled, setLofiTrack, replaceState,
@@ -309,11 +316,52 @@ export default function SettingsScreen() {
 
         {/* ── FEEDBACK ────────────────────────────────────────────────── */}
         {tab === 'feedback' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            <div style={{ fontSize:11, color:'var(--text-muted)' }}>Help us improve Focus Pilot!</div>
-            <button className="fp-btn fp-btn-p fp-btn-full">SUBMIT FEEDBACK</button>
-            <button className="fp-btn fp-btn-g fp-btn-full">★ WRITE A REVIEW</button>
-            <button className="fp-btn fp-btn-mu fp-btn-full">✉ SUPPORT EMAIL</button>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:0 }}>
+
+            {/* Mascot */}
+            <div style={{ marginBottom:14, animation:'fp-gentle-float 2.8s ease-in-out infinite' }}>
+              <PilotDuck level={level} size={56} />
+            </div>
+
+            {/* Heartfelt message */}
+            <div style={{ textAlign:'center', marginBottom:22, padding:'0 8px' }}>
+              <div style={{ fontSize:13, fontWeight:'bold', color:'var(--text)', marginBottom:7, letterSpacing:0.3 }}>
+                Thanks for using Focus Pilot.
+              </div>
+              <div style={{ fontSize:10, color:'var(--text-muted)', lineHeight:1.75 }}>
+                Every session you complete helps this little app grow.{'\n'}
+                Your feedback means the world — it shapes everything we build next.
+              </div>
+            </div>
+
+            <div style={{ width:'100%', display:'flex', flexDirection:'column', gap:10 }}>
+              {/* Submit Feedback */}
+              <a
+                href={FEEDBACK_FORM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration:'none' }}
+              >
+                <button className="fp-btn fp-btn-p fp-btn-full" style={{ fontSize:10, padding:'11px 0', letterSpacing:1.5 }}>
+                  ✦ SUBMIT FEEDBACK
+                </button>
+              </a>
+
+              {/* Support Email */}
+              <a
+                href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(SUPPORT_SUBJECT)}&body=${encodeURIComponent(SUPPORT_BODY)}`}
+                style={{ textDecoration:'none' }}
+              >
+                <button className="fp-btn fp-btn-mu fp-btn-full" style={{ fontSize:10, padding:'11px 0', letterSpacing:1.5 }}>
+                  ✉ SUPPORT EMAIL
+                </button>
+              </a>
+            </div>
+
+            {/* Subtle footer note */}
+            <div style={{ marginTop:18, fontSize:8, color:'var(--text-muted)', textAlign:'center', letterSpacing:0.3, opacity:0.6 }}>
+              {SUPPORT_EMAIL}
+            </div>
           </div>
         )}
 
