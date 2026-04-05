@@ -179,7 +179,7 @@ export default function SettingsScreen() {
         ))}
       </div>
 
-      <div className="fp-body" style={{ display:'flex', flexDirection:'column', gap:16 }}>
+      <div className="fp-body" style={{ display:'flex', flexDirection:'column', gap:16, flex:1 }}>
 
         {/* ── GENERAL ─────────────────────────────────────────────────── */}
         {tab === 'general' && (
@@ -316,10 +316,10 @@ export default function SettingsScreen() {
 
         {/* ── FEEDBACK ────────────────────────────────────────────────── */}
         {tab === 'feedback' && (
-          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:0 }}>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flex:1, minHeight:420, gap:0 }}>
 
             {/* Mascot */}
-            <div style={{ marginBottom:14, animation:'fp-gentle-float 2.8s ease-in-out infinite' }}>
+            <div style={{ marginBottom:18, animation:'fp-gentle-float 2.8s ease-in-out infinite' }}>
               <PilotDuck level={level} size={56} />
             </div>
 
