@@ -58,19 +58,21 @@ export default function Onboarding() {
     return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
-  // XP bar + panel fade once main mounts
+  // XP bar fills based on slide index: advances with each slide the user explores
+  const SLIDE_XP = [18, 42, 68, 92];
+
   useEffect(() => {
     if (phase !== 'main') return;
-    setTimeout(() => {
-      let pct = 0;
-      const iv = setInterval(() => {
-        pct += 3;
-        setXpFill(Math.min(pct, 62));
-        if (pct >= 62) clearInterval(iv);
-      }, 18);
-    }, 400);
+    // Animate in the first bar on mount
+    setTimeout(() => setXpFill(SLIDE_XP[0]), 400);
     setTimeout(() => setPanelVis(true), 700);
   }, [phase]);
+
+  // Advance XP bar whenever the user navigates to a new slide
+  useEffect(() => {
+    if (phase !== 'main') return;
+    setXpFill(SLIDE_XP[slideIdx]);
+  }, [slideIdx, phase]);
 
   function goToSlide(i: number) {
     if (i === slideIdx || sliding) return;
@@ -133,21 +135,6 @@ export default function Onboarding() {
         animation: 'fp-slide-up 0.38s cubic-bezier(0.34,1.3,0.64,1)',
       }}>
 
-        {/* GBA corner brackets */}
-        {(['tl','tr','bl','br'] as const).map((pos) => (
-          <div key={pos} style={{
-            position: 'absolute',
-            top:    pos.startsWith('t') ? -1 : undefined,
-            bottom: pos.startsWith('b') ? -1 : undefined,
-            left:   pos.endsWith('l')   ? -1 : undefined,
-            right:  pos.endsWith('r')   ? -1 : undefined,
-            width: 10, height: 10,
-            borderTop:    pos.startsWith('t') ? '2px solid #4ecca3' : undefined,
-            borderBottom: pos.startsWith('b') ? '2px solid #4ecca3' : undefined,
-            borderLeft:   pos.endsWith('l')   ? '2px solid #4ecca3' : undefined,
-            borderRight:  pos.endsWith('r')   ? '2px solid #4ecca3' : undefined,
-          }} />
-        ))}
 
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
@@ -165,17 +152,22 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* XP bar — subtle, no labels */}
+        {/* XP bar — fills as user explores slides */}
         <div style={{ marginBottom: 22 }}>
-          <div style={{
-            height: 3, background: 'var(--surface-2)',
-            borderRadius: 2, overflow: 'hidden',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ fontSize: 8, letterSpacing: 1, color: 'var(--text-muted)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              LVL 1
+            </div>
             <div style={{
-              height: '100%', width: `${xpFill}%`,
-              background: 'linear-gradient(90deg, #4ecca3, #f5a623)',
-              borderRadius: 2, transition: 'width 0.02s linear',
-            }} />
+              flex: 1, height: 4, background: 'var(--surface-2)',
+              borderRadius: 2, overflow: 'hidden',
+            }}>
+              <div style={{
+                height: '100%', width: `${xpFill}%`,
+                background: 'linear-gradient(90deg, #4ecca3, #f5a623)',
+                borderRadius: 2, transition: 'width 0.5s ease',
+              }} />
+            </div>
           </div>
         </div>
 
@@ -267,7 +259,7 @@ export default function Onboarding() {
 
           {/* CTA */}
           <button
-            className="fp-btn fp-btn-p fp-btn-full"
+            className="fp-btn fp-btn-gr fp-btn-full"
             style={{ fontSize: 11, padding: '12px 0', letterSpacing: 2 }}
             onClick={() => setHasSeenOnboarding(true)}
           >
