@@ -10,9 +10,9 @@ const SLIDES = [
     icon: '▶',
     title: 'Focus Mode',
     desc: 'Stay locked in with Pomodoro sessions',
-    accent: '#6366f1',
-    bg: 'rgba(99,102,241,0.07)',
-    border: 'rgba(99,102,241,0.2)',
+    accent: '#e94560',
+    bg: 'rgba(233,69,96,0.07)',
+    border: 'rgba(233,69,96,0.2)',
   },
   {
     icon: '◎',
@@ -285,7 +285,7 @@ export default function Onboarding() {
 
           {/* CTA */}
           <button
-            className="fp-btn fp-btn-gr fp-btn-full"
+            className="fp-btn fp-btn-r fp-btn-full"
             style={{ fontSize: 11, padding: '12px 0', letterSpacing: 2 }}
             onClick={() => {
               if (sounds) {
