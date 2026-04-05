@@ -3,14 +3,16 @@ import { useStore } from '../store/useStore';
 import PilotDuck from './PilotDuck';
 import { Sounds } from '../utils/sounds';
 
+const SESSIONS_LEFT = [4, 3, 2, 1];
+
 const SLIDES = [
   {
     icon: '▶',
     title: 'Focus Mode',
     desc: 'Stay locked in with Pomodoro sessions',
-    accent: '#e94560',
-    bg: 'rgba(233,69,96,0.07)',
-    border: 'rgba(233,69,96,0.2)',
+    accent: '#6366f1',
+    bg: 'rgba(99,102,241,0.07)',
+    border: 'rgba(99,102,241,0.2)',
   },
   {
     icon: '◎',
@@ -143,7 +145,7 @@ export default function Onboarding() {
         <div style={{ textAlign: 'center', marginBottom: 20 }}>
           <div style={{
             display: 'flex', justifyContent: 'center', marginBottom: 14,
-            animation: 'fp-bounce-in 0.55s cubic-bezier(0.34,1.56,0.64,1)',
+            animation: 'fp-gentle-float 2.8s ease-in-out infinite',
           }}>
             <PilotDuck level={level} size={56} />
           </div>
@@ -156,8 +158,8 @@ export default function Onboarding() {
         </div>
 
         {/* XP bar — fills as user explores slides */}
-        <div style={{ marginBottom: 22 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
             <div style={{ fontSize: 8, letterSpacing: 1, color: 'var(--text-muted)', whiteSpace: 'nowrap', flexShrink: 0 }}>
               LVL 1
             </div>
@@ -172,6 +174,13 @@ export default function Onboarding() {
               }} />
             </div>
           </div>
+          <div style={{
+            fontSize: 8, color: 'var(--text-muted)', textAlign: 'right',
+            letterSpacing: 0.3, transition: 'opacity 0.3s ease',
+            opacity: panelVis ? 0.7 : 0,
+          }}>
+            Next level in {SESSIONS_LEFT[slideIdx]} session{SESSIONS_LEFT[slideIdx] !== 1 ? 's' : ''}
+          </div>
         </div>
 
         {/* Feature slideshow */}
@@ -180,6 +189,11 @@ export default function Onboarding() {
           transform: panelVis ? 'translateY(0)' : 'translateY(10px)',
           transition: 'opacity 0.45s ease, transform 0.45s ease',
         }}>
+
+          {/* Carousel label */}
+          <div style={{ fontSize: 8, letterSpacing: 2, color: 'var(--text-muted)', marginBottom: 8 }}>
+            FEATURES
+          </div>
 
           {/* Slide card */}
           <div style={{
@@ -193,7 +207,8 @@ export default function Onboarding() {
             alignItems: 'center', justifyContent: 'center',
             textAlign: 'center',
             position: 'relative',
-            transition: 'background 0.3s ease, border-color 0.3s ease',
+            transition: 'background 0.3s ease, border-color 0.3s ease, transform 0.3s ease',
+            transform: sliding ? 'scale(0.98)' : 'scale(1)',
           }}>
             {/* Icon */}
             <div style={{
@@ -260,6 +275,14 @@ export default function Onboarding() {
             ))}
           </div>
 
+          {/* Action hint */}
+          <div style={{
+            textAlign: 'center', fontSize: 9,
+            color: 'var(--text-muted)', marginBottom: 10, letterSpacing: 0.3,
+          }}>
+            Start your first focus session
+          </div>
+
           {/* CTA */}
           <button
             className="fp-btn fp-btn-gr fp-btn-full"
@@ -272,7 +295,7 @@ export default function Onboarding() {
               setHasSeenOnboarding(true);
             }}
           >
-            LET'S GO ▶
+            LET'S FOCUS ▶
           </button>
         </div>
 
