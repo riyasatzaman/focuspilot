@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore';
 import PilotDuck from './PilotDuck';
+import { Sounds } from '../utils/sounds';
 
 const SLIDES = [
   {
@@ -48,6 +49,8 @@ export default function Onboarding() {
   const [slideDir, setSlideDir]   = useState<'left' | 'right'>('right');
 
   const level                = useStore((s) => s.level);
+  const sounds               = useStore((s) => s.sounds);
+  const volume               = useStore((s) => s.volume);
   const setHasSeenOnboarding = useStore((s) => s.setHasSeenOnboarding);
 
   // Boot → main transition
@@ -261,7 +264,13 @@ export default function Onboarding() {
           <button
             className="fp-btn fp-btn-gr fp-btn-full"
             style={{ fontSize: 11, padding: '12px 0', letterSpacing: 2 }}
-            onClick={() => setHasSeenOnboarding(true)}
+            onClick={() => {
+              if (sounds) {
+                Sounds.levelUp(volume);
+                setTimeout(() => Sounds.mascotQuack(volume), 780);
+              }
+              setHasSeenOnboarding(true);
+            }}
           >
             LET'S GO ▶
           </button>
