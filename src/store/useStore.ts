@@ -48,6 +48,7 @@ interface StoreActions {
   clearNlog: () => void;
   setLofiEnabled: (v: boolean) => void;
   setLofiTrack: (v: number) => void;
+  replaceState: (data: AppState) => void;
 }
 
 type Store = AppState & StoreActions;
@@ -371,6 +372,44 @@ export const useStore = create<Store>()(
       // ── Lo-fi music ───────────────────────────────────────────────────
       setLofiEnabled: (v) => set({ lofiEnabled: v }),
       setLofiTrack:   (v) => set({ lofiTrack: v }),
+
+      // ── Backup / restore ──────────────────────────────────────────────
+      replaceState: (data) => set({
+        tasks: data.tasks,
+        events: data.events,
+        notes: data.notes,
+        nlog: data.nlog,
+        customCats: data.customCats,
+        rewards: data.rewards,
+        focusLog: data.focusLog,
+        taskOrder: data.taskOrder,
+        xp: data.xp,
+        level: data.level,
+        points: data.points,
+        stats: data.stats,
+        pomosToday: data.pomosToday,
+        cyclePomos: data.cyclePomos,
+        activeTaskId: data.activeTaskId,
+        pomoPhase: data.pomoPhase,
+        pomoSecs: data.pomoSecs,
+        sounds: data.sounds,
+        notifs: data.notifs,
+        focusDur: data.focusDur,
+        breakDur: data.breakDur,
+        focusInt: data.focusInt,
+        longBreakDur: data.longBreakDur,
+        volume: data.volume,
+        sndFocus: data.sndFocus,
+        sndBreak: data.sndBreak,
+        sndLevelUp: data.sndLevelUp,
+        sndXp: data.sndXp,
+        sndTask: data.sndTask,
+        theme: data.theme,
+        lofiEnabled: false,
+        lofiTrack: data.lofiTrack,
+        pomoRunning: false,
+        activeNoteId: null,
+      }),
     }),
     { name: STORAGE_KEY },
   ),

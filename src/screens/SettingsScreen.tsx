@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { Sounds } from '../utils/sounds';
 import { LOFI_TRACKS } from '../utils/lofi';
+import { exportBackup, validateBackup } from '../utils/backup';
+import Toast from '../components/Toast';
+import type { AppState } from '../types';
 
 type Tab = 'general' | 'sounds' | 'focus' | 'feedback';
 
@@ -17,14 +20,65 @@ type SndKey = typeof SOUND_ENTRIES[number]['key'];
 
 export default function SettingsScreen() {
   const [tab, setTab] = useState<Tab>('general');
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingImport, setPendingImport] = useState<AppState | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const {
     sounds, notifs, volume, focusDur, breakDur, focusInt, longBreakDur,
     sndFocus, sndBreak, sndLevelUp, sndXp, sndTask,
     theme, lofiEnabled, lofiTrack,
     setSounds, setNotifs, setVolume, setFocusDur, setBreakDur, setFocusInt, setLongBreakDur,
     setSndFocus, setSndBreak, setSndLevelUp, setSndXp, setSndTask,
-    toggleTheme, setScreen, setLofiEnabled, setLofiTrack,
+    toggleTheme, setScreen, setLofiEnabled, setLofiTrack, replaceState,
   } = useStore();
+
+  function handleExport() {
+    try {
+      exportBackup();
+      setToast({ msg: 'Backup exported', ok: true });
+    } catch {
+      setToast({ msg: 'Export failed', ok: false });
+    }
+  }
+
+  function handleImportClick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // reset so same file can be re-selected
+    e.target.value = '';
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const raw = JSON.parse(ev.target?.result as string);
+        const validated = validateBackup(raw);
+        setPendingImport(validated);
+        setConfirmOpen(true);
+      } catch (err) {
+        setToast({ msg: err instanceof Error ? err.message : 'Invalid backup file', ok: false });
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function handleConfirmImport() {
+    if (!pendingImport) return;
+    replaceState(pendingImport);
+    setPendingImport(null);
+    setConfirmOpen(false);
+    setToast({ msg: 'Data imported successfully', ok: true });
+  }
+
+  function handleCancelImport() {
+    setPendingImport(null);
+    setConfirmOpen(false);
+  }
 
   const sndValues: Record<SndKey, boolean> = { sndFocus, sndBreak, sndLevelUp, sndXp, sndTask };
   const sndSetters: Record<SndKey, (v: boolean) => void> = {
@@ -39,6 +93,60 @@ export default function SettingsScreen() {
 
   return (
     <div style={{ display:'flex', flexDirection:'column', minHeight:600 }}>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display:'none' }}
+        onChange={handleFileChange}
+      />
+
+      {/* Toast */}
+      {toast && (
+        <Toast
+          msg={toast.msg}
+          color={toast.ok ? '#4ecca3' : '#e94560'}
+          onDone={() => setToast(null)}
+        />
+      )}
+
+      {/* Confirm modal */}
+      {confirmOpen && (
+        <div style={{
+          position:'fixed', inset:0, background:'rgba(0,0,0,0.65)',
+          display:'flex', alignItems:'center', justifyContent:'center', zIndex:200,
+        }}>
+          <div style={{
+            background:'var(--bg)', border:'1px solid var(--border)',
+            borderRadius:10, padding:24, maxWidth:280, width:'90%',
+          }}>
+            <div style={{ fontSize:12, color:'var(--text)', marginBottom:10, fontWeight:'bold', letterSpacing:0.5 }}>
+              REPLACE ALL DATA?
+            </div>
+            <div style={{ fontSize:10, color:'var(--text-muted)', lineHeight:1.6, marginBottom:18 }}>
+              This will overwrite all your current tasks, notes, events, XP, and settings with the backup. This cannot be undone.
+            </div>
+            <div style={{ display:'flex', gap:10 }}>
+              <button
+                className="fp-btn fp-btn-mu"
+                style={{ flex:1, padding:'8px 0', fontSize:10 }}
+                onClick={handleCancelImport}
+              >
+                CANCEL
+              </button>
+              <button
+                className="fp-btn fp-btn-p"
+                style={{ flex:1, padding:'8px 0', fontSize:10 }}
+                onClick={handleConfirmImport}
+              >
+                IMPORT
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="fp-hdr">
         <button className="fp-hbk" onClick={() => setScreen('home')}>◀ BACK</button>
         <div className="fp-htitle" style={{ color:'var(--text)' }}>SETTINGS</div>
@@ -85,6 +193,25 @@ export default function SettingsScreen() {
             <div style={{ height:1, background:'var(--border)' }} />
             <ToggleRow label="Sound Effects" value={sounds} onChange={setSounds} />
             <ToggleRow label="Notifications"  value={notifs}  onChange={setNotifs} />
+
+            <div style={{ height:1, background:'var(--border)', marginTop:4 }} />
+            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>DATA</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              <button
+                className="fp-btn fp-btn-g fp-btn-full"
+                style={{ fontSize:10, padding:'9px 0' }}
+                onClick={handleExport}
+              >
+                ↓ EXPORT DATA
+              </button>
+              <button
+                className="fp-btn fp-btn-mu fp-btn-full"
+                style={{ fontSize:10, padding:'9px 0' }}
+                onClick={handleImportClick}
+              >
+                ↑ IMPORT DATA
+              </button>
+            </div>
           </>
         )}
 
