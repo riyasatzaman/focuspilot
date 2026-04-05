@@ -306,7 +306,7 @@ export default function HomeScreen() {
         {/* Clickable mascot */}
         <div
           data-no-click-sound
-          style={{ cursor:'pointer', userSelect:'none', display:'inline-block' }}
+          style={{ cursor:'pointer', userSelect:'none', display:'inline-block', animation:'fp-gentle-float 2.8s ease-in-out infinite' }}
           onClick={handleMascotClick}
           title="Click me!"
         >
