@@ -16,6 +16,23 @@ function fmtMins(m: number) {
   return `${min}m`;
 }
 
+/** Live clock — updates every second */
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const iv = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(iv);
+  }, []);
+  const dateStr = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  const timeStr = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0 10px', borderBottom: '1px solid var(--border)', marginBottom: 10 }}>
+      <div style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: 0.5 }}>{dateStr}</div>
+      <div style={{ fontSize: 10, color: '#e94560', letterSpacing: 1, fontWeight: 'bold', fontVariantNumeric: 'tabular-nums' }}>{timeStr}</div>
+    </div>
+  );
+}
+
 /** Expandable stats bar shown at the top of the focus screen */
 function FocusMiniStats() {
   const stats = useStore(s => s.stats);
@@ -115,6 +132,7 @@ function FocusMiniStats() {
       {/* Expanded focus history panel */}
       {expanded && (
         <div style={{ padding: '4px 16px 14px', borderTop: '1px solid var(--border)', background: 'var(--surface)' }}>
+          <LiveClock />
           <div style={{ fontSize: 8, color: 'var(--text-muted)', letterSpacing: 1, marginBottom: 10 }}>FOCUS HISTORY — LAST 7 DAYS</div>
 
           {/* Bar chart */}

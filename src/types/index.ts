@@ -74,6 +74,7 @@ export interface AppState {
   pomoPhase: PomoPhase;
   pomoSecs: number;
   pomoRunning: boolean;
+  phaseStartedAt: number | null; // epoch ms when current phase's timer was last started/resumed
 
   // Settings
   sounds: boolean;

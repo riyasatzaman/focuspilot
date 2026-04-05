@@ -98,6 +98,25 @@ function pushNotif(state: AppState, msg: string, color: string): Partial<AppStat
   return { nlog: newNlog };
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Record actual elapsed focus time when a session is interrupted (pause / reset / task-switch).
+ *  Only logs if the phase is 'focus', running, and at least 1 minute has elapsed. */
+function logPartialFocus(state: AppState): AppState['focusLog'] {
+  if (
+    state.pomoPhase === 'focus' &&
+    state.pomoRunning &&
+    state.phaseStartedAt !== null
+  ) {
+    const elapsedMins = Math.round((Date.now() - state.phaseStartedAt) / 60000);
+    if (elapsedMins >= 1) {
+      const today = new Date().toISOString().split('T')[0];
+      return [...state.focusLog, { date: today, mins: elapsedMins }].slice(-500);
+    }
+  }
+  return state.focusLog;
+}
+
 // ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useStore = create<Store>()(
@@ -122,6 +141,7 @@ export const useStore = create<Store>()(
       pomoPhase: 'focus',
       pomoSecs: 25 * 60,
       pomoRunning: false,
+      phaseStartedAt: null,
       sounds: true,
       notifs: true,
       focusDur: 25,
@@ -189,7 +209,9 @@ export const useStore = create<Store>()(
 
       setActiveTask: (id) => {
         const state = get();
-        set({ activeTaskId: id, pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, cyclePomos: 0 });
+        // Log any partial focus time before switching tasks
+        const focusLog = logPartialFocus(state);
+        set({ activeTaskId: id, pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, cyclePomos: 0, phaseStartedAt: null, focusLog });
       },
 
       // ── Pomodoro ──────────────────────────────────────────────────────
@@ -197,26 +219,39 @@ export const useStore = create<Store>()(
         const state = get();
         if (!state.pomoRunning) return;
 
-        if (state.pomoSecs > 0) {
-          // Only track time during focus phase — not during breaks
+        // Wall-clock sync: use phaseStartedAt to stay accurate even in background tabs
+        let remainingSecs: number;
+        let deltaTaskSecs = 1;
+
+        if (state.phaseStartedAt !== null) {
+          const phaseDurSecs = state.pomoPhase === 'focus' ? state.focusDur * 60
+            : state.pomoPhase === 'break' ? state.breakDur * 60
+            : state.longBreakDur * 60;
+          const elapsed = Math.floor((Date.now() - state.phaseStartedAt) / 1000);
+          remainingSecs = phaseDurSecs - elapsed;
+          // How many real seconds passed since the last stored pomoSecs value
+          deltaTaskSecs = Math.max(1, state.pomoSecs - remainingSecs);
+        } else {
+          remainingSecs = state.pomoSecs - 1;
+        }
+
+        if (remainingSecs > 0) {
+          // Only accumulate timeSpent during focus phase
           const tasks = state.activeTaskId && state.pomoPhase === 'focus'
             ? state.tasks.map((t) =>
-                t.id === state.activeTaskId ? { ...t, timeSpent: t.timeSpent + 1 } : t,
+                t.id === state.activeTaskId ? { ...t, timeSpent: t.timeSpent + deltaTaskSecs } : t,
               )
             : state.tasks;
-          set({ pomoSecs: state.pomoSecs - 1, tasks });
+          set({ pomoSecs: remainingSecs, tasks });
           return;
         }
 
         // ── Phase expired ───────────────────────────────────────────────
         if (state.pomoPhase === 'focus') {
-          // Play focus complete sound
           if (state.sounds && state.sndFocus) Sounds.focusComplete(state.volume);
 
           const activeTask = state.tasks.find((t) => t.id === state.activeTaskId);
           const statKeys = activeTask?.stats ?? [];
-          // XP scales with position in the cycle: 25 × (session number)
-          // e.g. sessions 1→4 award 25, 50, 75, 100 XP then reset
           const sessionXP = (state.cyclePomos + 1) * 25;
           const updates = gainXP(state, sessionXP, statKeys);
 
@@ -231,9 +266,12 @@ export const useStore = create<Store>()(
             { ...state, ...updates } as AppState, notifMsg, '#4ecca3',
           );
 
-          // Log focus session to history
+          // Use real elapsed time for accurate logging
           const today = new Date().toISOString().split('T')[0];
-          const newFocusLog = [...state.focusLog, { date: today, mins: state.focusDur }].slice(-500);
+          const actualMins = state.phaseStartedAt
+            ? Math.max(1, Math.round((Date.now() - state.phaseStartedAt) / 60000))
+            : state.focusDur;
+          const newFocusLog = [...state.focusLog, { date: today, mins: actualMins }].slice(-500);
 
           set({
             pomoPhase: isLongBreak ? 'longBreak' : 'break',
@@ -242,6 +280,7 @@ export const useStore = create<Store>()(
             pomosToday: state.pomosToday + 1,
             cyclePomos: isLongBreak ? 0 : newCyclePomos,
             focusLog: newFocusLog,
+            phaseStartedAt: null,
             ...updates,
             ...notifUpdates,
           });
@@ -249,23 +288,28 @@ export const useStore = create<Store>()(
         } else if (state.pomoPhase === 'break') {
           if (state.sounds && state.sndBreak) Sounds.breakEnd(state.volume);
           const notifUpdates = pushNotif(state, 'Break over! Time to focus.', '#e94560');
-          set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, ...notifUpdates });
+          set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, phaseStartedAt: null, ...notifUpdates });
 
         } else {
-          // longBreak expired
           if (state.sounds && state.sndBreak) Sounds.longBreakEnd(state.volume);
           const notifUpdates = pushNotif(state, 'Long break over! Start a new cycle.', '#e94560');
-          set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, ...notifUpdates });
+          set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, phaseStartedAt: null, ...notifUpdates });
         }
       },
 
-      startPomo: () => set({ pomoRunning: true }),
-      pausePomo: () => set({ pomoRunning: false }),
+      startPomo: () => set({ pomoRunning: true, phaseStartedAt: Date.now() }),
+
+      pausePomo: () => {
+        const state = get();
+        const focusLog = logPartialFocus(state);
+        set({ pomoRunning: false, phaseStartedAt: null, focusLog });
+      },
 
       skipPhase: () => {
         const state = get();
         if (state.pomoPhase === 'focus') {
-          // Award partial XP then decide break type
+          // Log any partial focus time before skipping
+          const focusLog = logPartialFocus(state);
           const updates = gainXP(state, 25, []);
           const newCyclePomos = state.cyclePomos + 1;
           const isLongBreak = newCyclePomos >= state.focusInt;
@@ -275,18 +319,20 @@ export const useStore = create<Store>()(
             cyclePomos: isLongBreak ? 0 : newCyclePomos,
             pomosToday: state.pomosToday + 1,
             pomoRunning: false,
+            phaseStartedAt: null,
+            focusLog,
             points: ((updates.points ?? state.points) + 8),
             ...updates,
           });
         } else {
-          // skip break or longBreak → back to focus
-          set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false });
+          set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, phaseStartedAt: null });
         }
       },
 
       resetTimer: () => {
         const state = get();
-        set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false });
+        const focusLog = logPartialFocus(state);
+        set({ pomoPhase: 'focus', pomoSecs: state.focusDur * 60, pomoRunning: false, phaseStartedAt: null, focusLog });
       },
 
       // ── Countdown events ──────────────────────────────────────────────
@@ -410,6 +456,7 @@ export const useStore = create<Store>()(
         lofiEnabled: false,
         lofiTrack: data.lofiTrack,
         pomoRunning: false,
+        phaseStartedAt: null,
         activeNoteId: null,
         hasSeenOnboarding: true,
       }),
