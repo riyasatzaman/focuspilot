@@ -32,7 +32,6 @@ export default function App() {
   const hasSeenOnboarding        = useStore((s) => s.hasSeenOnboarding);
   const hasInitializedContent    = useStore((s) => s.hasInitializedContent);
   const setHasInitializedContent = useStore((s) => s.setHasInitializedContent);
-  const addTask                  = useStore((s) => s.addTask);
   const Screen = SCREENS[screen] ?? HomeScreen;
 
   // Seed starter content exactly once on first launch
@@ -40,12 +39,22 @@ export default function App() {
     if (hasInitializedContent) return;
     const now = Date.now();
 
-    // Default task
-    addTask(
-      'Start Focus Session',
-      'Start a 25 min focus session and fully concentrate. Earn XP, level up your stats, and take a 5 min break after completion.',
-      [],
-    );
+    // Default tasks — injected directly so we control order and stats
+    const t1: import('./types').Task = {
+      id: now - 2, label: 'Start Focus Session',
+      notes: 'Start a 25 min focus session and fully concentrate. Earn XP, level up your stats, and take a 5 min break after completion.',
+      catIds: [], stats: [], done: false, timeSpent: 0, created: now - 2,
+    };
+    const t2: import('./types').Task = {
+      id: now - 1, label: 'Level Up An Attribute',
+      notes: 'Choose the attribute/s this task strengthens. Every completed session builds your stats and moves you closer to leveling up.',
+      catIds: ['strength', 'skills', 'intellect'], stats: ['str', 'skl', 'int'],
+      done: false, timeSpent: 0, created: now - 1,
+    };
+    useStore.setState((s) => ({
+      tasks: [t1, t2, ...s.tasks],
+      taskOrder: s.taskOrder.length > 0 ? [t1.id, t2.id, ...s.taskOrder] : [],
+    }));
 
     // Default notes — editedAt offsets control sort order (highest = top in "Last Edited" view)
     // Order: Leveling System (1st) → Your Focus Companion (2nd) → Earn Rewards (3rd)
