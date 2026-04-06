@@ -47,13 +47,14 @@ export default function App() {
       [],
     );
 
-    // Default notes (added oldest-first so they appear in order)
-    const noteBase = { color: '#a855f7', time: new Date().toLocaleString(), createdAt: now, editedAt: now };
+    // Default notes — editedAt offsets control sort order (highest = top in "Last Edited" view)
+    // Order: Leveling System (1st) → Your Focus Companion (2nd) → Earn Rewards (3rd)
+    const timeStr = new Date().toLocaleString();
     useStore.setState((s) => ({
       notes: [
-        { ...noteBase, id: now + 3, title: 'Your Focus Companion',  body: 'Your companion grows with you. Stay consistent, build habits, and watch your progress come to life.' },
-        { ...noteBase, id: now + 2, title: 'Earn Rewards',           body: 'Complete focus sessions to earn points. Redeem them for real-life rewards like snacks, breaks, or anything you enjoy.' },
-        { ...noteBase, id: now + 1, title: 'Leveling System',        body: 'Every focus session earns you XP. Build your stats — Strength, Intelligence, Skills, and Vitality — and level up over time.' },
+        { id: now + 1, title: 'Earn Rewards',          body: 'Complete focus sessions to earn points. Redeem them for real-life rewards like snacks, breaks, or anything you enjoy.', color: '#a855f7', time: timeStr, createdAt: now + 1, editedAt: now + 1 },
+        { id: now + 2, title: 'Your Focus Companion',  body: 'Your companion grows with you. Stay consistent, build habits, and watch your progress come to life.',                    color: '#a855f7', time: timeStr, createdAt: now + 2, editedAt: now + 2 },
+        { id: now + 3, title: 'Leveling System',       body: 'Every focus session earns you XP. Build your stats — Strength, Intelligence, Skills, and Vitality — and level up over time.', color: '#a855f7', time: timeStr, createdAt: now + 3, editedAt: now + 3 },
         ...s.notes,
       ],
     }));
