@@ -373,14 +373,14 @@ export default function HomeScreen() {
       {/* Bottom utility row — small & understated */}
       <div style={{ display:'flex', gap:6, marginTop:2 }}>
         {[
-          { label:'NOTIFS',   action: () => setScreen('notifs'),   style: {} },
-          { label:'★ REDEEM', action: () => setRewardOpen(true),   style: { borderColor:'rgba(245,166,35,0.35)', color:'rgba(245,166,35,0.7)' } },
-          { label:'SETTINGS', action: () => setScreen('settings'), style: {} },
+          { label:'NOTIFS',   action: () => setScreen('notifs'),   cls: '',               style: {} },
+          { label:'★ REDEEM', action: () => setRewardOpen(true),   cls: 'fp-btn-redeem',  style: { borderColor:'rgba(245,166,35,0.35)', color:'rgba(245,166,35,0.7)' } },
+          { label:'SETTINGS', action: () => setScreen('settings'), cls: '',               style: {} },
         ].map(btn => (
           <button
             key={btn.label}
             onClick={btn.action}
-            className="fp-btn-utility"
+            className={`fp-btn-utility${btn.cls ? ' ' + btn.cls : ''}`}
             style={{
               background:'transparent', border:'1px solid var(--border)',
               color:'var(--text-muted)', fontFamily:'inherit',
