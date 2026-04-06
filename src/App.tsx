@@ -30,16 +30,21 @@ export default function App() {
   const screen                   = useStore((s) => s.screen);
   const theme                    = useStore((s) => s.theme);
   const hasSeenOnboarding        = useStore((s) => s.hasSeenOnboarding);
-  const hasInitializedContent    = useStore((s) => s.hasInitializedContent);
-  const setHasInitializedContent = useStore((s) => s.setHasInitializedContent);
   const Screen = SCREENS[screen] ?? HomeScreen;
 
-  // Seed starter content exactly once on first launch
+  // Seed starter content exactly once on first launch.
+  // Read the flag directly from getState() — avoids the React StrictMode
+  // double-invoke race where the reactive value hasn't updated yet.
   useEffect(() => {
-    if (hasInitializedContent) return;
-    const now = Date.now();
+    if (useStore.getState().hasInitializedContent) return;
 
-    // Default tasks — injected directly so we control order and stats
+    // Mark first so a second invocation (StrictMode) is a no-op
+    useStore.getState().setHasInitializedContent(true);
+
+    const now = Date.now();
+    const timeStr = new Date().toLocaleString();
+
+    // Default tasks
     const t1: import('./types').Task = {
       id: now - 2, label: 'Start Focus Session',
       notes: 'Start a 25 min focus session and fully concentrate. Earn XP, level up your stats, and take a 5 min break after completion.',
@@ -51,24 +56,19 @@ export default function App() {
       catIds: ['strength', 'skills', 'intellect'], stats: ['str', 'skl', 'int'],
       done: false, timeSpent: 0, created: now - 1,
     };
+
+    // Default notes — higher editedAt = higher in "Last Edited" sort
+    // Order top→bottom: Leveling System, Your Focus Companion, Earn Rewards
     useStore.setState((s) => ({
       tasks: [t1, t2, ...s.tasks],
       taskOrder: s.taskOrder.length > 0 ? [t1.id, t2.id, ...s.taskOrder] : [],
-    }));
-
-    // Default notes — editedAt offsets control sort order (highest = top in "Last Edited" view)
-    // Order: Leveling System (1st) → Your Focus Companion (2nd) → Earn Rewards (3rd)
-    const timeStr = new Date().toLocaleString();
-    useStore.setState((s) => ({
       notes: [
-        { id: now + 1, title: 'Earn Rewards',          body: 'Complete focus sessions to earn points. Redeem them for real-life rewards like snacks, breaks, or anything you enjoy.', color: '#a855f7', time: timeStr, createdAt: now + 1, editedAt: now + 1 },
-        { id: now + 2, title: 'Your Focus Companion',  body: 'Your companion grows with you. Stay consistent, build habits, and watch your progress come to life.',                    color: '#a855f7', time: timeStr, createdAt: now + 2, editedAt: now + 2 },
-        { id: now + 3, title: 'Leveling System',       body: 'Every focus session earns you XP. Build your stats — Strength, Intelligence, Skills, and Vitality — and level up over time.', color: '#a855f7', time: timeStr, createdAt: now + 3, editedAt: now + 3 },
+        { id: now + 1, title: 'Earn Rewards',         body: 'Complete focus sessions to earn points. Redeem them for real-life rewards like snacks, breaks, or anything you enjoy.', color: '#4ecca3', time: timeStr, createdAt: now + 1, editedAt: now + 1 },
+        { id: now + 2, title: 'Your Focus Companion', body: 'Your companion grows with you. Stay consistent, build habits, and watch your progress come to life.',                    color: '#e94560', time: timeStr, createdAt: now + 2, editedAt: now + 2 },
+        { id: now + 3, title: 'Leveling System',      body: 'Every focus session earns you XP. Build your stats — Strength, Intelligence, Skills, and Vitality — and level up over time.', color: '#f5a623', time: timeStr, createdAt: now + 3, editedAt: now + 3 },
         ...s.notes,
       ],
     }));
-
-    setHasInitializedContent(true);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
