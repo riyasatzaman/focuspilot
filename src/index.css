@@ -429,16 +429,16 @@ body {
       0deg,
       transparent,
       transparent 31px,
-      rgba(110, 75, 200, 0.055) 31px,
-      rgba(110, 75, 200, 0.055) 32px
+      rgba(110, 75, 200, 0.045) 31px,
+      rgba(110, 75, 200, 0.045) 32px
     ),
     /* Vertical lines */
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 31px,
-      rgba(110, 75, 200, 0.055) 31px,
-      rgba(110, 75, 200, 0.055) 32px
+      rgba(110, 75, 200, 0.045) 31px,
+      rgba(110, 75, 200, 0.045) 32px
     ),
     /* Base gradient */
     linear-gradient(155deg, #faf7ff 0%, #ede6ff 55%, #fcf5ff 100%);
