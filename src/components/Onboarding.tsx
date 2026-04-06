@@ -262,7 +262,7 @@ export default function Onboarding() {
 
           {/* Dots */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 18 }}>
-            {SLIDES.map((s, i) => (
+            {SLIDES.map((_, i) => (
               <div
                 key={i}
                 onClick={() => goToSlide(i)}

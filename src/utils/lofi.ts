@@ -19,9 +19,8 @@ const FADE_STEPS  = 30;
 class Mp3Player {
   private audio: HTMLAudioElement | null = null;
   private fadeTimer: ReturnType<typeof setInterval> | null = null;
-  private _playing  = false;
-  private _trackIdx = 0;
-  private _vol      = 0.7; // 0–1 internal
+  private _playing = false;
+  private _vol     = 0.7; // 0–1 internal
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -85,8 +84,7 @@ class Mp3Player {
   // ── Public API ────────────────────────────────────────────────────────────
 
   play(trackIdx: number, volume: number) {
-    this._trackIdx = trackIdx;
-    this._vol      = volume / 100;
+    this._vol = volume / 100;
     this._playing  = true;
     this.loadAndPlay(trackIdx);
   }
@@ -104,8 +102,7 @@ class Mp3Player {
 
   /** Fade out current track, swap, fade in new one. */
   setTrack(trackIdx: number, volume: number) {
-    this._trackIdx = trackIdx;
-    this._vol      = volume / 100;
+    this._vol = volume / 100;
     if (!this._playing) return;
     this.fadeOut(() => {
       if (!this._playing) return; // may have been stopped during fade
