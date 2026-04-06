@@ -51,7 +51,6 @@ body {
   min-height: 100vh;
   font-family: 'Courier New', Courier, monospace;
   color: var(--text);
-  transition: background 0.3s;
 }
 
 #root {
@@ -415,13 +414,11 @@ body {
 /* ── App shell: base style (dark) + light override ───────────────────────── */
 .fp-app-shell {
   background: var(--bg);
-  transition: background 0.3s;
 }
 /* In light mode the app shell is transparent so the body gradient flows through
    seamlessly — no visible rectangular panel / box-within-a-box effect. */
 [data-theme="light"] .fp-app-shell {
   background: transparent;
-  transition: none;
 }
 
 /* ── Body gradient ───────────────────────────────────────────────────────── */
