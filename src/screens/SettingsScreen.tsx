@@ -124,7 +124,7 @@ export default function SettingsScreen() {
           position:'fixed', inset:0, background:'rgba(0,0,0,0.65)',
           display:'flex', alignItems:'center', justifyContent:'center', zIndex:200,
         }}>
-          <div style={{
+          <div className="fp-modal-panel" style={{
             background:'var(--bg)', border:'1px solid var(--border)',
             borderRadius:10, padding:24, maxWidth:280, width:'90%',
           }}>

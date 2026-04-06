@@ -324,7 +324,7 @@ export default function HomeScreen() {
         {dialog && <div className="fp-retro-bubble">{dialog}</div>}
       </div>
 
-      <div style={{ fontSize:21, fontWeight:'bold', letterSpacing:2 }}>
+      <div className="fp-logo" style={{ fontSize:21, fontWeight:'bold', letterSpacing:2 }}>
         <span style={{ color:'#e94560' }}>FOCUS</span>
         <span style={{ color:'#f5a623' }}>PILOT</span>
       </div>
@@ -332,6 +332,7 @@ export default function HomeScreen() {
 
       {/* XP bar row */}
       <div
+        className="fp-xp-container"
         onClick={() => setExpanded(e => !e)}
         style={{
           width:'100%', maxWidth:280,
@@ -348,7 +349,7 @@ export default function HomeScreen() {
 
       {/* Expanded pilot card */}
       {expanded && (
-        <div style={{ width:'100%', maxWidth:280, background:'var(--bg-panel)', border:'1.5px solid var(--border)', borderRadius:6, padding:'13px 14px' }}>
+        <div className="fp-pilot-card" style={{ width:'100%', maxWidth:280, background:'var(--bg-panel)', border:'1.5px solid var(--border)', borderRadius:6, padding:'13px 14px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:11, marginBottom:10 }}>
             <PilotDuck level={level} size={44} />
             <div style={{ flex:1, minWidth:0 }}>
@@ -379,6 +380,7 @@ export default function HomeScreen() {
           <button
             key={btn.label}
             onClick={btn.action}
+            className="fp-btn-utility"
             style={{
               background:'transparent', border:'1px solid var(--border)',
               color:'var(--text-muted)', fontFamily:'inherit',
@@ -398,7 +400,7 @@ export default function HomeScreen() {
           position:'fixed', inset:0, background:'var(--overlay)',
           display:'flex', alignItems:'center', justifyContent:'center', zIndex:100,
         }}>
-          <div style={{ background:'var(--bg-panel)', border:'1.5px solid var(--border)', borderRadius:8, padding:20, width:300, maxHeight:'80vh', display:'flex', flexDirection:'column' }}>
+          <div className="fp-modal-panel" style={{ background:'var(--bg-panel)', border:'1.5px solid var(--border)', borderRadius:8, padding:20, width:300, maxHeight:'80vh', display:'flex', flexDirection:'column' }}>
             {/* Header */}
             <div style={{ display:'flex', alignItems:'center', marginBottom:4 }}>
               <div style={{ fontSize:12, color:'#f5a623', fontWeight:'bold', flex:1 }}>★ REWARD SHOP</div>

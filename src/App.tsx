@@ -61,19 +61,20 @@ export default function App() {
       <LofiController />
       <PomoController />
       {!hasSeenOnboarding && <Onboarding />}
-      <div style={{
-        background: 'var(--bg)',
-        color: 'var(--text)',
-        height: 600,
-        maxWidth: 390,
-        width: '100%',
-        borderRadius: 0,
-        overflow: 'hidden',
-        fontFamily: "'Courier New', Courier, monospace",
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'background 0.3s',
-      }}>
+      <div
+        className="fp-app-shell"
+        style={{
+          color: 'var(--text)',
+          height: 600,
+          maxWidth: 390,
+          width: '100%',
+          borderRadius: 0,
+          overflow: 'hidden',
+          fontFamily: "'Courier New', Courier, monospace",
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <Screen />
       </div>
     </>
