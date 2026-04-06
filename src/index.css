@@ -22,22 +22,22 @@
 }
 
 :root[data-theme="light"] {
-  --bg-body:    #f4f0ff;
-  --bg:         #f4f0ff;
+  --bg-body:    #f3efff;
+  --bg:         #f8f5ff;
   --bg-panel:   #ffffff;
-  --surface:    rgba(255,255,255,0.75);
-  --surface-2:  rgba(255,255,255,0.95);
-  --border:     rgba(100,70,190,0.13);
-  --border-2:   rgba(100,70,190,0.25);
-  --text:       #150f2e;
+  --surface:    rgba(255,255,255,0.72);
+  --surface-2:  rgba(255,255,255,0.96);
+  --border:     rgba(110,75,200,0.11);
+  --border-2:   rgba(110,75,200,0.26);
+  --text:       #18102e;
   --text-sub:   #3d3460;
-  --text-muted: #7c6e9a;
-  --inp-bg:     rgba(255,255,255,0.88);
-  --inp-border: rgba(100,70,190,0.18);
-  --btn-mu-hover-text:   #150f2e;
-  --btn-mu-hover-border: rgba(100,70,190,0.35);
-  --scrollbar:  rgba(100,70,190,0.15);
-  --overlay:    rgba(80,60,140,0.45);
+  --text-muted: #7868a0;
+  --inp-bg:     rgba(255,255,255,0.92);
+  --inp-border: rgba(110,75,200,0.18);
+  --btn-mu-hover-text:   #18102e;
+  --btn-mu-hover-border: rgba(110,75,200,0.35);
+  --scrollbar:  rgba(110,75,200,0.14);
+  --overlay:    rgba(75,50,140,0.48);
 }
 
 /* ── Reset ────────────────────────────────────────────────────────────────── */
@@ -406,3 +406,168 @@ body {
 .fp-note-body b, .fp-note-body strong { font-weight: bold; }
 .fp-note-body i, .fp-note-body em    { font-style: italic; }
 .fp-note-body u                      { text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LIGHT MODE PREMIUM THEME
+   Soft gradients · glass surfaces · colour glows · lift interactions
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── App shell: base style (dark) + light override ───────────────────────── */
+.fp-app-shell {
+  background: var(--bg);
+  transition: background 0.3s;
+}
+[data-theme="light"] .fp-app-shell {
+  background: linear-gradient(168deg, #fefcff 0%, #f1eaff 50%, #fdf7ff 100%);
+  transition: none; /* gradient cross-fade is janky; instant is cleaner */
+}
+
+/* ── Body gradient ───────────────────────────────────────────────────────── */
+[data-theme="light"] body {
+  background: linear-gradient(155deg, #faf7ff 0%, #ede6ff 55%, #fcf5ff 100%);
+}
+
+/* ── Header: gentle frosted look ─────────────────────────────────────────── */
+[data-theme="light"] .fp-hdr {
+  background: rgba(255, 252, 255, 0.80);
+  border-bottom-color: rgba(110, 75, 200, 0.10);
+}
+
+/* ── Buttons: upgrade transition on all types ────────────────────────────── */
+[data-theme="light"] .fp-btn {
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+              background 0.15s ease, opacity 0.15s ease;
+}
+/* Keep the retro press-down feel but reset lift/shadow */
+[data-theme="light"] .fp-btn:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: none !important;
+}
+
+/* Focus → soft red/pink glass */
+[data-theme="light"] .fp-btn-r {
+  background: rgba(233, 69, 96, 0.05);
+  box-shadow: 0 2px 12px rgba(233, 69, 96, 0.14), 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .fp-btn-r:hover {
+  background: rgba(233, 69, 96, 0.10);
+  box-shadow: 0 5px 20px rgba(233, 69, 96, 0.24), 0 2px 6px rgba(0,0,0,0.06);
+  transform: translateY(-1.5px);
+}
+
+/* Countdown → warm orange glass */
+[data-theme="light"] .fp-btn-g {
+  background: rgba(245, 166, 35, 0.05);
+  box-shadow: 0 2px 12px rgba(245, 166, 35, 0.18), 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .fp-btn-g:hover {
+  background: rgba(245, 166, 35, 0.10);
+  box-shadow: 0 5px 20px rgba(245, 166, 35, 0.28), 0 2px 6px rgba(0,0,0,0.06);
+  transform: translateY(-1.5px);
+}
+
+/* Notes → soft purple glass */
+[data-theme="light"] .fp-btn-p {
+  background: rgba(168, 85, 247, 0.05);
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.16), 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .fp-btn-p:hover {
+  background: rgba(168, 85, 247, 0.10);
+  box-shadow: 0 5px 20px rgba(168, 85, 247, 0.26), 0 2px 6px rgba(0,0,0,0.06);
+  transform: translateY(-1.5px);
+}
+
+/* Green accent buttons */
+[data-theme="light"] .fp-btn-gr {
+  background: rgba(78, 204, 163, 0.05);
+  box-shadow: 0 2px 12px rgba(78, 204, 163, 0.16), 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .fp-btn-gr:hover {
+  background: rgba(78, 204, 163, 0.10);
+  box-shadow: 0 5px 20px rgba(78, 204, 163, 0.26), 0 2px 6px rgba(0,0,0,0.06);
+  transform: translateY(-1.5px);
+}
+
+/* Blue accent buttons */
+[data-theme="light"] .fp-btn-b {
+  background: rgba(59, 130, 246, 0.05);
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.16), 0 1px 3px rgba(0,0,0,0.05);
+}
+[data-theme="light"] .fp-btn-b:hover {
+  background: rgba(59, 130, 246, 0.10);
+  box-shadow: 0 5px 20px rgba(59, 130, 246, 0.26), 0 2px 6px rgba(0,0,0,0.06);
+  transform: translateY(-1.5px);
+}
+
+/* Muted utility buttons — subtle white glass */
+[data-theme="light"] .fp-btn-mu {
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 1px 6px rgba(110, 75, 200, 0.08), 0 1px 2px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .fp-btn-mu:hover {
+  background: rgba(255, 255, 255, 0.90);
+  box-shadow: 0 3px 10px rgba(110, 75, 200, 0.12), 0 1px 3px rgba(0,0,0,0.05);
+  transform: translateY(-0.5px);
+}
+
+/* ── Small utility buttons (NOTIFS / REDEEM / SETTINGS row) ──────────────── */
+[data-theme="light"] .fp-btn-utility {
+  background: rgba(255, 255, 255, 0.62) !important;
+  box-shadow: 0 1px 6px rgba(110, 75, 200, 0.08), 0 1px 2px rgba(0,0,0,0.04);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+[data-theme="light"] .fp-btn-utility:hover {
+  background: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 2px 10px rgba(110, 75, 200, 0.13), 0 1px 3px rgba(0,0,0,0.05);
+  transform: translateY(-0.5px);
+}
+[data-theme="light"] .fp-btn-utility:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: none !important;
+}
+
+/* ── Task rows: glass card ───────────────────────────────────────────────── */
+[data-theme="light"] .fp-trow {
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 1px 8px rgba(110, 75, 200, 0.07), 0 1px 2px rgba(0,0,0,0.04);
+}
+[data-theme="light"] .fp-trow:hover:not(.fp-trow-done) {
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 3px 14px rgba(110, 75, 200, 0.12), 0 1px 3px rgba(0,0,0,0.05);
+  border-color: rgba(110, 75, 200, 0.22);
+}
+
+/* ── XP bar track ────────────────────────────────────────────────────────── */
+[data-theme="light"] .fp-xp-track {
+  background: rgba(110, 75, 200, 0.10) !important;
+}
+
+/* XP bar fill: warm pink → orange → purple gradient */
+[data-theme="light"] .fp-xp-fill {
+  background: linear-gradient(90deg, #e94560 0%, #f5a623 46%, #a855f7 100%) !important;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.28);
+}
+
+/* ── XP row container (home screen) ─────────────────────────────────────── */
+[data-theme="light"] .fp-xp-container {
+  background: rgba(255, 255, 255, 0.70) !important;
+  box-shadow: 0 2px 14px rgba(110, 75, 200, 0.09), 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* ── Expanded pilot card ─────────────────────────────────────────────────── */
+[data-theme="light"] .fp-pilot-card {
+  background: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: 0 4px 22px rgba(110, 75, 200, 0.10), 0 1px 5px rgba(0,0,0,0.05);
+}
+
+/* ── Logo glow ───────────────────────────────────────────────────────────── */
+[data-theme="light"] .fp-logo {
+  filter: drop-shadow(0 0 14px rgba(233, 69, 96, 0.18))
+          drop-shadow(0 0 22px rgba(245, 166, 35, 0.12));
+}
+
+/* ── Modal inner panels ──────────────────────────────────────────────────── */
+[data-theme="light"] .fp-modal-panel {
+  background: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 10px 48px rgba(110, 75, 200, 0.18), 0 2px 12px rgba(0,0,0,0.06);
+}
