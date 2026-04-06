@@ -99,7 +99,7 @@ export default function SettingsScreen() {
   const tabs: Tab[] = ['general', 'sounds', 'focus', 'feedback'];
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', minHeight:600 }}>
+    <div style={{ display:'flex', flexDirection:'column', flex:1, minHeight:0 }}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}

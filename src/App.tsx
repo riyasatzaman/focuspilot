@@ -64,7 +64,7 @@ export default function App() {
       <div style={{
         background: 'var(--bg)',
         color: 'var(--text)',
-        minHeight: 600,
+        height: 600,
         maxWidth: 390,
         width: '100%',
         borderRadius: 0,
