@@ -50,6 +50,7 @@ interface StoreActions {
   setLofiTrack: (v: number) => void;
   replaceState: (data: AppState) => void;
   setHasSeenOnboarding: (v: boolean) => void;
+  setHasInitializedContent: (v: boolean) => void;
 }
 
 type Store = AppState & StoreActions;
@@ -160,6 +161,7 @@ export const useStore = create<Store>()(
       screen: 'home',
       activeNoteId: null,
       hasSeenOnboarding: false,
+      hasInitializedContent: false,
 
       // ── Navigation ────────────────────────────────────────────────────
       setScreen: (screen) => set({ screen }),
@@ -463,6 +465,9 @@ export const useStore = create<Store>()(
 
       // ── Onboarding ────────────────────────────────────────────────────
       setHasSeenOnboarding: (v) => set({ hasSeenOnboarding: v }),
+
+      // ── Starter content ───────────────────────────────────────────────
+      setHasInitializedContent: (v) => set({ hasInitializedContent: v }),
     }),
     { name: STORAGE_KEY },
   ),

@@ -103,4 +103,7 @@ export interface AppState {
 
   // Onboarding
   hasSeenOnboarding: boolean;
+
+  // Starter content
+  hasInitializedContent: boolean;
 }

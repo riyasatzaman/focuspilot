@@ -27,10 +27,40 @@ const SCREENS: Record<string, React.ComponentType> = {
 };
 
 export default function App() {
-  const screen             = useStore((s) => s.screen);
-  const theme              = useStore((s) => s.theme);
-  const hasSeenOnboarding  = useStore((s) => s.hasSeenOnboarding);
+  const screen                   = useStore((s) => s.screen);
+  const theme                    = useStore((s) => s.theme);
+  const hasSeenOnboarding        = useStore((s) => s.hasSeenOnboarding);
+  const hasInitializedContent    = useStore((s) => s.hasInitializedContent);
+  const setHasInitializedContent = useStore((s) => s.setHasInitializedContent);
+  const addTask                  = useStore((s) => s.addTask);
   const Screen = SCREENS[screen] ?? HomeScreen;
+
+  // Seed starter content exactly once on first launch
+  useEffect(() => {
+    if (hasInitializedContent) return;
+    const now = Date.now();
+
+    // Default task
+    addTask(
+      'Start Focus Session',
+      'Start a 25 min focus session and fully concentrate. Earn XP, level up your stats, and take a 5 min break after completion.',
+      [],
+    );
+
+    // Default notes (added oldest-first so they appear in order)
+    const noteBase = { color: '#a855f7', time: new Date().toLocaleString(), createdAt: now, editedAt: now };
+    useStore.setState((s) => ({
+      notes: [
+        { ...noteBase, id: now + 3, title: 'Your Focus Companion',  body: 'Your companion grows with you. Stay consistent, build habits, and watch your progress come to life.' },
+        { ...noteBase, id: now + 2, title: 'Earn Rewards',           body: 'Complete focus sessions to earn points. Redeem them for real-life rewards like snacks, breaks, or anything you enjoy.' },
+        { ...noteBase, id: now + 1, title: 'Leveling System',        body: 'Every focus session earns you XP. Build your stats — Strength, Intelligence, Skills, and Vitality — and level up over time.' },
+        ...s.notes,
+      ],
+    }));
+
+    setHasInitializedContent(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const sounds = useStore((s) => s.sounds);
   const volume = useStore((s) => s.volume);
