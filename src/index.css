@@ -442,60 +442,60 @@ body {
 }
 /* Per-button :active rules handle their own press — no global override needed */
 
-/* Focus → solid red, white cutout text, retro hard shadow */
+/* Focus → solid red, white cutout text, retro black hard shadow */
 [data-theme="light"] .fp-btn-r {
   background: #e94560;
   color: #ffffff;
   border-color: #e94560;
-  box-shadow: 4px 4px 0 #9e1f35;
+  box-shadow: 4px 4px 0 #111;
 }
 [data-theme="light"] .fp-btn-r:hover {
   background: #d4294a;
   border-color: #d4294a;
   color: #ffffff;
-  box-shadow: 5px 5px 0 #9e1f35;
+  box-shadow: 5px 5px 0 #111;
   transform: translateY(-1px);
 }
 [data-theme="light"] .fp-btn-r:active {
-  box-shadow: 2px 2px 0 #9e1f35 !important;
+  box-shadow: 2px 2px 0 #111 !important;
   transform: translate(2px, 2px) !important;
 }
 
-/* Countdown → solid orange/gold, white cutout text, retro hard shadow */
+/* Countdown → solid orange/gold, white cutout text, retro black hard shadow */
 [data-theme="light"] .fp-btn-g {
   background: #f5a623;
   color: #ffffff;
   border-color: #f5a623;
-  box-shadow: 4px 4px 0 #a86b08;
+  box-shadow: 4px 4px 0 #111;
 }
 [data-theme="light"] .fp-btn-g:hover {
   background: #df9614;
   border-color: #df9614;
   color: #ffffff;
-  box-shadow: 5px 5px 0 #a86b08;
+  box-shadow: 5px 5px 0 #111;
   transform: translateY(-1px);
 }
 [data-theme="light"] .fp-btn-g:active {
-  box-shadow: 2px 2px 0 #a86b08 !important;
+  box-shadow: 2px 2px 0 #111 !important;
   transform: translate(2px, 2px) !important;
 }
 
-/* Notes → solid purple, white cutout text, retro hard shadow */
+/* Notes → solid purple, white cutout text, retro black hard shadow */
 [data-theme="light"] .fp-btn-p {
   background: #a855f7;
   color: #ffffff;
   border-color: #a855f7;
-  box-shadow: 4px 4px 0 #6b21a8;
+  box-shadow: 4px 4px 0 #111;
 }
 [data-theme="light"] .fp-btn-p:hover {
   background: #9333ea;
   border-color: #9333ea;
   color: #ffffff;
-  box-shadow: 5px 5px 0 #6b21a8;
+  box-shadow: 5px 5px 0 #111;
   transform: translateY(-1px);
 }
 [data-theme="light"] .fp-btn-p:active {
-  box-shadow: 2px 2px 0 #6b21a8 !important;
+  box-shadow: 2px 2px 0 #111 !important;
   transform: translate(2px, 2px) !important;
 }
 
@@ -532,15 +532,15 @@ body {
   transform: translateY(-0.5px);
 }
 
-/* ── Small utility buttons (NOTIFS / SETTINGS) — retro hard shadow ───────── */
+/* ── Small utility buttons (NOTIFS / SETTINGS) — retro black hard shadow ──── */
 [data-theme="light"] .fp-btn-utility {
   background: rgba(255, 255, 255, 0.82) !important;
-  box-shadow: 3px 3px 0 rgba(110, 75, 200, 0.30);
+  box-shadow: 3px 3px 0 #111;
   transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 [data-theme="light"] .fp-btn-utility:hover {
   background: rgba(255, 255, 255, 0.96) !important;
-  box-shadow: 4px 4px 0 rgba(110, 75, 200, 0.35);
+  box-shadow: 4px 4px 0 #111;
   transform: translateY(-1px);
 }
 [data-theme="light"] .fp-btn-utility:active {
@@ -548,17 +548,17 @@ body {
   box-shadow: none !important;
 }
 
-/* ── REDEEM utility button — solid gold/orange, white text, retro shadow ─── */
+/* ── REDEEM utility button — solid gold, white text, retro black shadow ───── */
 [data-theme="light"] .fp-btn-redeem {
   background: #f5a623 !important;
   color: #ffffff !important;
   border-color: #f5a623 !important;
-  box-shadow: 3px 3px 0 #a86b08 !important;
+  box-shadow: 3px 3px 0 #111 !important;
 }
 [data-theme="light"] .fp-btn-redeem:hover {
   background: #df9614 !important;
   border-color: #df9614 !important;
-  box-shadow: 4px 4px 0 #a86b08 !important;
+  box-shadow: 4px 4px 0 #111 !important;
   transform: translateY(-1px);
 }
 [data-theme="light"] .fp-btn-redeem:active {
