@@ -238,18 +238,58 @@ export default function SettingsScreen() {
             <div style={{ height:1, background:'var(--border)' }} />
 
             {/* Lo-fi music section */}
-            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1, marginBottom:8 }}>LO-FI BACKGROUND MUSIC</div>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-              <span style={{ fontSize:11, color:'var(--text)' }}>Enable lo-fi music</span>
-              <Toggle value={lofiEnabled} onChange={setLofiEnabled} />
+            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>LO-FI BACKGROUND MUSIC</div>
+
+            {/* Transport controls */}
+            <div style={{
+              display:'flex', alignItems:'center', justifyContent:'space-between',
+              background:'var(--surface)', border:'1px solid var(--border)',
+              borderRadius:8, padding:'10px 14px',
+            }}>
+              {/* Track info */}
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:10, color:'var(--text)', fontWeight:'bold', letterSpacing:0.5, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                  {LOFI_TRACKS[lofiTrack].name}
+                </div>
+                <div style={{ fontSize:8, color:'var(--text-muted)', marginTop:2 }}>
+                  {lofiEnabled ? '▶ PLAYING' : '◼ STOPPED'} · {LOFI_TRACKS[lofiTrack].bpm} BPM
+                </div>
+              </div>
+              {/* Buttons */}
+              <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
+                {/* Prev */}
+                <button
+                  onClick={() => { const i = (lofiTrack - 1 + LOFI_TRACKS.length) % LOFI_TRACKS.length; setLofiTrack(i); if (!lofiEnabled) setLofiEnabled(true); }}
+                  style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:5, color:'var(--text-muted)', fontFamily:'inherit', fontSize:12, padding:'5px 9px', cursor:'pointer', lineHeight:1 }}
+                  title="Previous track"
+                >◀</button>
+                {/* Play / Pause */}
+                <button
+                  onClick={() => setLofiEnabled(!lofiEnabled)}
+                  style={{
+                    background: lofiEnabled ? 'rgba(168,85,247,0.15)' : 'transparent',
+                    border:`1.5px solid ${lofiEnabled ? '#a855f7' : 'var(--border)'}`,
+                    borderRadius:5, color: lofiEnabled ? '#a855f7' : 'var(--text-muted)',
+                    fontFamily:'inherit', fontSize:13, padding:'5px 11px', cursor:'pointer', lineHeight:1,
+                    transition:'all 0.15s',
+                  }}
+                  title={lofiEnabled ? 'Pause' : 'Play'}
+                >{lofiEnabled ? '⏸' : '▶'}</button>
+                {/* Next */}
+                <button
+                  onClick={() => { const i = (lofiTrack + 1) % LOFI_TRACKS.length; setLofiTrack(i); if (!lofiEnabled) setLofiEnabled(true); }}
+                  style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:5, color:'var(--text-muted)', fontFamily:'inherit', fontSize:12, padding:'5px 9px', cursor:'pointer', lineHeight:1 }}
+                  title="Next track"
+                >▶▶</button>
+              </div>
             </div>
-            {/* Track selector */}
-            <div style={{ display:'flex', flexDirection:'column', gap:5, opacity: lofiEnabled ? 1 : 0.4, transition:'opacity 0.2s' }}>
+
+            {/* Track list */}
+            <div style={{ display:'flex', flexDirection:'column', gap:5, opacity: lofiEnabled ? 1 : 0.5, transition:'opacity 0.2s' }}>
               {LOFI_TRACKS.map((track, i) => (
                 <button
                   key={i}
                   onClick={() => { setLofiTrack(i); if (!lofiEnabled) setLofiEnabled(true); }}
-                  disabled={!lofiEnabled && lofiTrack !== i}
                   style={{
                     display:'flex', alignItems:'center', gap:10,
                     background: lofiTrack === i ? 'rgba(168,85,247,0.10)' : 'transparent',
@@ -274,8 +314,8 @@ export default function SettingsScreen() {
               ))}
             </div>
 
-            <div style={{ height:1, background:'var(--border)', marginTop:4 }} />
-            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1, marginBottom:2 }}>INDIVIDUAL SOUNDS</div>
+            <div style={{ height:1, background:'var(--border)' }} />
+            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>INDIVIDUAL SOUNDS</div>
 
             {SOUND_ENTRIES.map(entry => (
               <div key={entry.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
