@@ -238,13 +238,13 @@ export default function SettingsScreen() {
             <div style={{ height:1, background:'var(--border)' }} />
 
             {/* Lo-fi music section */}
-            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1, marginBottom:8 }}>LO-FI BACKGROUND MUSIC</div>
+            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>LO-FI BACKGROUND MUSIC</div>
 
             {/* Transport controls */}
             <div style={{
               display:'flex', alignItems:'center', justifyContent:'space-between',
               background:'var(--surface)', border:'1px solid var(--border)',
-              borderRadius:8, padding:'10px 14px', marginBottom:10,
+              borderRadius:8, padding:'10px 14px',
             }}>
               {/* Track info */}
               <div style={{ flex:1, minWidth:0 }}>
@@ -314,8 +314,8 @@ export default function SettingsScreen() {
               ))}
             </div>
 
-            <div style={{ height:1, background:'var(--border)', marginTop:4 }} />
-            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1, marginBottom:2 }}>INDIVIDUAL SOUNDS</div>
+            <div style={{ height:1, background:'var(--border)' }} />
+            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>INDIVIDUAL SOUNDS</div>
 
             {SOUND_ENTRIES.map(entry => (
               <div key={entry.key} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
