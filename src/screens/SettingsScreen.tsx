@@ -8,8 +8,8 @@ import PilotDuck from '../components/PilotDuck';
 import type { AppState } from '../types';
 
 // ── Feedback config — replace with real URLs before launch ───────────────────
-const FEEDBACK_FORM_URL = 'https://forms.gle/REPLACE_ME';
-const SUPPORT_EMAIL     = 'supportfocuspilot@gmail.com';
+const FEEDBACK_FORM_URL = 'https://forms.gle/bJ2hrfd16Zhu7nQF8';
+const SUPPORT_EMAIL     = 'axiommindofficial@gmail.com';
 const SUPPORT_SUBJECT   = 'Focus Pilot Support';
 const SUPPORT_BODY      = 'Hi Focus Pilot team,\n\n';
 
