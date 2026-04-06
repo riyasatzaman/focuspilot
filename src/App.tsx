@@ -57,6 +57,10 @@ export default function App() {
       done: false, timeSpent: 0, created: now - 1,
     };
 
+    // Default rewards
+    const r1: import('./types').Reward = { id: now - 6, label: 'Have a snack!',      cost: 25 };
+    const r2: import('./types').Reward = { id: now - 5, label: 'Take a nap (25 min)', cost: 50 };
+
     // Default countdown events
     const past5  = new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     const future5 = new Date(now + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -69,6 +73,7 @@ export default function App() {
       tasks: [t1, t2, ...s.tasks],
       taskOrder: s.taskOrder.length > 0 ? [t1.id, t2.id, ...s.taskOrder] : [],
       events: [e1, e2, ...s.events],
+      rewards: [r1, r2, ...s.rewards],
       notes: [
         { id: now + 1, title: 'Earn Rewards',         body: 'Complete focus sessions to earn points. Redeem them for real-life rewards like snacks, breaks, or anything you enjoy.', color: '#4ecca3', time: timeStr, createdAt: now + 1, editedAt: now + 1 },
         { id: now + 2, title: 'Your Focus Companion', body: 'Your companion grows with you. Stay consistent, build habits, and watch your progress come to life.',                    color: '#e94560', time: timeStr, createdAt: now + 2, editedAt: now + 2 },
