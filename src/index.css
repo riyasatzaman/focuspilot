@@ -440,55 +440,63 @@ body {
   transition: transform 0.15s ease, box-shadow 0.15s ease,
               background 0.15s ease, opacity 0.15s ease;
 }
-/* Keep the retro press-down feel but reset lift/shadow */
-[data-theme="light"] .fp-btn:active {
-  transform: translate(1px, 1px) !important;
-  box-shadow: none !important;
-}
+/* Per-button :active rules handle their own press — no global override needed */
 
-/* Focus → solid red, white cutout text */
+/* Focus → solid red, white cutout text, retro hard shadow */
 [data-theme="light"] .fp-btn-r {
   background: #e94560;
   color: #ffffff;
   border-color: #e94560;
-  box-shadow: 0 3px 14px rgba(233, 69, 96, 0.28);
+  box-shadow: 4px 4px 0 #9e1f35;
 }
 [data-theme="light"] .fp-btn-r:hover {
   background: #d4294a;
   border-color: #d4294a;
   color: #ffffff;
-  box-shadow: 0 5px 22px rgba(233, 69, 96, 0.38);
-  transform: translateY(-1.5px);
+  box-shadow: 5px 5px 0 #9e1f35;
+  transform: translateY(-1px);
+}
+[data-theme="light"] .fp-btn-r:active {
+  box-shadow: 2px 2px 0 #9e1f35 !important;
+  transform: translate(2px, 2px) !important;
 }
 
-/* Countdown → solid orange/gold, white cutout text */
+/* Countdown → solid orange/gold, white cutout text, retro hard shadow */
 [data-theme="light"] .fp-btn-g {
   background: #f5a623;
   color: #ffffff;
   border-color: #f5a623;
-  box-shadow: 0 3px 14px rgba(245, 166, 35, 0.30);
+  box-shadow: 4px 4px 0 #a86b08;
 }
 [data-theme="light"] .fp-btn-g:hover {
   background: #df9614;
   border-color: #df9614;
   color: #ffffff;
-  box-shadow: 0 5px 22px rgba(245, 166, 35, 0.40);
-  transform: translateY(-1.5px);
+  box-shadow: 5px 5px 0 #a86b08;
+  transform: translateY(-1px);
+}
+[data-theme="light"] .fp-btn-g:active {
+  box-shadow: 2px 2px 0 #a86b08 !important;
+  transform: translate(2px, 2px) !important;
 }
 
-/* Notes → solid purple, white cutout text */
+/* Notes → solid purple, white cutout text, retro hard shadow */
 [data-theme="light"] .fp-btn-p {
   background: #a855f7;
   color: #ffffff;
   border-color: #a855f7;
-  box-shadow: 0 3px 14px rgba(168, 85, 247, 0.28);
+  box-shadow: 4px 4px 0 #6b21a8;
 }
 [data-theme="light"] .fp-btn-p:hover {
   background: #9333ea;
   border-color: #9333ea;
   color: #ffffff;
-  box-shadow: 0 5px 22px rgba(168, 85, 247, 0.38);
-  transform: translateY(-1.5px);
+  box-shadow: 5px 5px 0 #6b21a8;
+  transform: translateY(-1px);
+}
+[data-theme="light"] .fp-btn-p:active {
+  box-shadow: 2px 2px 0 #6b21a8 !important;
+  transform: translate(2px, 2px) !important;
 }
 
 /* Green accent buttons */
@@ -524,37 +532,37 @@ body {
   transform: translateY(-0.5px);
 }
 
-/* ── Small utility buttons (NOTIFS / REDEEM / SETTINGS row) ──────────────── */
+/* ── Small utility buttons (NOTIFS / SETTINGS) — retro hard shadow ───────── */
 [data-theme="light"] .fp-btn-utility {
-  background: rgba(255, 255, 255, 0.62) !important;
-  box-shadow: 0 1px 6px rgba(110, 75, 200, 0.08), 0 1px 2px rgba(0,0,0,0.04);
+  background: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: 3px 3px 0 rgba(110, 75, 200, 0.30);
   transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 [data-theme="light"] .fp-btn-utility:hover {
-  background: rgba(255, 255, 255, 0.88) !important;
-  box-shadow: 0 2px 10px rgba(110, 75, 200, 0.13), 0 1px 3px rgba(0,0,0,0.05);
-  transform: translateY(-0.5px);
+  background: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 4px 4px 0 rgba(110, 75, 200, 0.35);
+  transform: translateY(-1px);
 }
 [data-theme="light"] .fp-btn-utility:active {
-  transform: translate(1px, 1px) !important;
+  transform: translate(3px, 3px) !important;
   box-shadow: none !important;
 }
 
-/* ── REDEEM utility button — solid gold/orange, white text ──────────────── */
+/* ── REDEEM utility button — solid gold/orange, white text, retro shadow ─── */
 [data-theme="light"] .fp-btn-redeem {
-  background: #f5a623 !important;   /* override inline borderColor/color */
+  background: #f5a623 !important;
   color: #ffffff !important;
   border-color: #f5a623 !important;
-  box-shadow: 0 2px 10px rgba(245, 166, 35, 0.28);
+  box-shadow: 3px 3px 0 #a86b08 !important;
 }
 [data-theme="light"] .fp-btn-redeem:hover {
   background: #df9614 !important;
   border-color: #df9614 !important;
-  box-shadow: 0 4px 16px rgba(245, 166, 35, 0.38);
+  box-shadow: 4px 4px 0 #a86b08 !important;
   transform: translateY(-1px);
 }
 [data-theme="light"] .fp-btn-redeem:active {
-  transform: translate(1px, 1px) !important;
+  transform: translate(3px, 3px) !important;
   box-shadow: none !important;
 }
 
