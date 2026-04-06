@@ -57,11 +57,18 @@ export default function App() {
       done: false, timeSpent: 0, created: now - 1,
     };
 
+    // Default countdown events
+    const past5  = new Date(now - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const future5 = new Date(now + 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const e1: import('./types').CountdownEvent = { id: now - 4, name: 'Class Test',       date: past5,   color: '#e94560', created: now - 4 };
+    const e2: import('./types').CountdownEvent = { id: now - 3, name: 'Important Event',  date: future5, color: '#f5a623', created: now - 3 };
+
     // Default notes — higher editedAt = higher in "Last Edited" sort
     // Order top→bottom: Leveling System, Your Focus Companion, Earn Rewards
     useStore.setState((s) => ({
       tasks: [t1, t2, ...s.tasks],
       taskOrder: s.taskOrder.length > 0 ? [t1.id, t2.id, ...s.taskOrder] : [],
+      events: [e1, e2, ...s.events],
       notes: [
         { id: now + 1, title: 'Earn Rewards',         body: 'Complete focus sessions to earn points. Redeem them for real-life rewards like snacks, breaks, or anything you enjoy.', color: '#4ecca3', time: timeStr, createdAt: now + 1, editedAt: now + 1 },
         { id: now + 2, title: 'Your Focus Companion', body: 'Your companion grows with you. Stay consistent, build habits, and watch your progress come to life.',                    color: '#e94560', time: timeStr, createdAt: now + 2, editedAt: now + 2 },
