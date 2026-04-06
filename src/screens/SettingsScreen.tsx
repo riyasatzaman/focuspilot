@@ -358,10 +358,6 @@ export default function SettingsScreen() {
               </a>
             </div>
 
-            {/* Subtle footer note */}
-            <div style={{ marginTop:18, fontSize:8, color:'var(--text-muted)', textAlign:'center', letterSpacing:0.3, opacity:0.6 }}>
-              {SUPPORT_EMAIL}
-            </div>
           </div>
         )}
 
