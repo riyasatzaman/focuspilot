@@ -5,7 +5,6 @@ import XPBar from '../components/XPBar';
 import StatGrid from '../components/StatGrid';
 import { xpInfo } from '../constants/levels';
 import { Sounds } from '../utils/sounds';
-import { LOFI_TRACKS } from '../utils/lofi';
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
 
@@ -26,123 +25,6 @@ const DIALOGS = [
   "get to work.",
   "hey!",
 ];
-
-// ── Theme toggle button (bottom-left, mirrors record player) ─────────────────
-function ThemeButton({ theme, onToggle }: { theme: string; onToggle: () => void }) {
-  const isDark = theme === 'dark';
-
-  return (
-    /* Outer anchor — fixed size, never moves, mirrors record player on the left */
-    <div data-no-click-sound style={{ position: 'absolute', bottom: 18, left: 18, width: 44, height: 44, zIndex: 10 }}>
-      <button
-        onClick={onToggle}
-        title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-        style={{ background: 'none', border: 'none', padding: 3, cursor: 'pointer', display: 'flex' }}
-      >
-        {isDark ? (
-          /* ── Sun SVG: rays spin slowly around centre ── */
-          <svg width={38} height={38} viewBox="0 0 38 38"
-            style={{ display: 'block', filter: 'drop-shadow(0 0 6px rgba(245,166,35,0.55))', transition: 'filter 0.3s', overflow: 'visible' }}
-          >
-            {/* Spinning rays */}
-            <g className="fp-sun-spin">
-              {[0, 45, 90, 135, 180, 225, 270, 315].map(deg => {
-                const r = deg * Math.PI / 180;
-                return (
-                  <line key={deg}
-                    x1={19 + Math.cos(r) * 12} y1={19 + Math.sin(r) * 12}
-                    x2={19 + Math.cos(r) * 17} y2={19 + Math.sin(r) * 17}
-                    stroke="#f5a623" strokeWidth={2.2} strokeLinecap="round"
-                  />
-                );
-              })}
-            </g>
-            {/* Static core */}
-            <circle cx={19} cy={19} r={8.5} fill="#f5a623" />
-            <circle cx={19} cy={19} r={5.5} fill="#ffd166" />
-          </svg>
-        ) : (
-          /* ── Moon SVG: crescent + stars, gently breathes ── */
-          <svg width={38} height={38} viewBox="0 0 38 38"
-            className="fp-moon-breathe"
-            style={{ display: 'block', filter: 'drop-shadow(0 0 6px rgba(168,85,247,0.55))', transition: 'filter 0.3s' }}
-          >
-            {/* Crescent */}
-            <circle cx={19} cy={19} r={12} fill="#a855f7" />
-            <circle cx={25} cy={15} r={10} fill="var(--bg)" />
-            {/* Stars */}
-            <circle cx={30} cy={10} r={1.4} fill="#a855f7" opacity={0.85} />
-            <circle cx={28} cy={28} r={1.0} fill="#a855f7" opacity={0.65} />
-            <circle cx={11} cy={9}  r={0.9} fill="#a855f7" opacity={0.55} />
-            <circle cx={8}  cy={22} r={0.7} fill="#a855f7" opacity={0.45} />
-          </svg>
-        )}
-      </button>
-    </div>
-  );
-}
-
-// ── Record player button ──────────────────────────────────────────────────────
-function RecordButton({ enabled, trackName, onToggle }: { enabled: boolean; trackName: string; onToggle: () => void }) {
-  const [showLabel, setShowLabel] = useState(false);
-  const labelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleClick = () => {
-    onToggle();
-    // Show track name label for 3s on play, hide on stop
-    if (!enabled) {
-      setShowLabel(true);
-      if (labelTimerRef.current) clearTimeout(labelTimerRef.current);
-      labelTimerRef.current = setTimeout(() => setShowLabel(false), 3000);
-    } else {
-      setShowLabel(false);
-      if (labelTimerRef.current) clearTimeout(labelTimerRef.current);
-    }
-  };
-
-  return (
-    /* Outer anchor — fixed size, never moves */
-    <div data-no-click-sound style={{ position: 'absolute', bottom: 18, right: 18, width: 44, height: 44, zIndex: 10 }}>
-
-      {/* Track name label — absolutely to the LEFT of the disc, disc never shifts */}
-      {showLabel && (
-        <div style={{
-          position: 'absolute',
-          right: 50,   /* sits just left of the 44px disc */
-          bottom: 6,   /* vertically centred with disc */
-          fontSize: 8, color: '#a855f7', letterSpacing: 1,
-          background: 'var(--bg-panel)', border: '1px solid rgba(168,85,247,0.3)',
-          borderRadius: 3, padding: '3px 7px', whiteSpace: 'nowrap',
-          animation: 'fp-fadein 0.18s ease forwards',
-          pointerEvents: 'none',
-        }}>
-          {trackName}
-        </div>
-      )}
-
-      {/* The record disc — always at the same position */}
-      <button
-        onClick={handleClick}
-        title={enabled ? 'Stop music' : 'Play lo-fi music'}
-        style={{ background: 'none', border: 'none', padding: 3, cursor: 'pointer', display: 'flex' }}
-      >
-        <svg
-          width={38} height={38} viewBox="0 0 38 38"
-          className={enabled ? 'fp-record-spin' : ''}
-          style={{ display: 'block', filter: enabled ? 'drop-shadow(0 0 5px rgba(168,85,247,0.55))' : 'none', transition: 'filter 0.3s' }}
-        >
-          <circle cx={19} cy={19} r={18} fill="#1a1a1a" />
-          {[14, 11, 8].map(r => (
-            <circle key={r} cx={19} cy={19} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} />
-          ))}
-          <circle cx={19} cy={19} r={6.5} fill={enabled ? '#a855f7' : '#333'} style={{ transition: 'fill 0.3s' }} />
-          <circle cx={19} cy={19} r={2} fill="#111" />
-          <path d="M 8 14 A 12 12 0 0 1 30 14" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={2} strokeLinecap="round" />
-        </svg>
-      </button>
-    </div>
-  );
-}
 
 // ── Confetti burst ────────────────────────────────────────────────────────────
 const CONFETTI_COLORS = ['#f5a623', '#e94560', '#4ecca3', '#a855f7', '#3b82f6', '#ffffff'];
@@ -240,7 +122,7 @@ export default function HomeScreen() {
   const dialogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const duckDivRef = useRef<HTMLDivElement>(null);
 
-  const { xp, level, points, stats, setScreen, toggleTheme, theme, sounds, volume, rewards, addReward, deleteReward, redeemReward, lofiEnabled, setLofiEnabled, lofiTrack, pomoRunning, pomoSecs, pomoPhase } = useStore();
+  const { xp, level, points, stats, setScreen, sounds, volume, rewards, addReward, deleteReward, redeemReward, pomoRunning, pomoSecs, pomoPhase } = useStore();
   const info = xpInfo(xp);
 
   const handleMascotClick = useCallback(() => {
@@ -277,16 +159,6 @@ export default function HomeScreen() {
 
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flex:1, padding:'32px 24px', gap:14 }}>
-
-      {/* Theme toggle — bottom-left, mirrors record player */}
-      <ThemeButton theme={theme} onToggle={toggleTheme} />
-
-      {/* Record player — bottom-right */}
-      <RecordButton
-        enabled={lofiEnabled}
-        trackName={LOFI_TRACKS[lofiTrack]?.name ?? ''}
-        onToggle={() => setLofiEnabled(!lofiEnabled)}
-      />
 
       {/* ── Mascot + timer bubble ─────────────────────────────────────── */}
       <div style={{ position:'relative', display:'inline-block', width: 80 }}>
