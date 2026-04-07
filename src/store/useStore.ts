@@ -4,6 +4,7 @@ import type { AppState, Task, CountdownEvent, Note, StatKey, Reward } from '../t
 import { BASE_CATS } from '../constants/categories';
 import { xpInfo } from '../constants/levels';
 import { Sounds } from '../utils/sounds';
+import { lofiPlayer } from '../utils/lofi';
 
 const STORAGE_KEY = 'fpv4';
 
@@ -57,7 +58,7 @@ type Store = AppState & StoreActions;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function gainXP(state: AppState, amount: number, statKeys: StatKey[]): Partial<AppState> {
+function gainXP(state: AppState, amount: number, statKeys: StatKey[], levelUpDelay = 0): Partial<AppState> {
   const newXp = state.xp + amount;
   const newPoints = state.points + Math.round(amount / 4);
   const { level: newLevel } = xpInfo(newXp);
@@ -81,9 +82,11 @@ function gainXP(state: AppState, amount: number, statKeys: StatKey[]): Partial<A
   if (state.sounds) {
     if (state.sndXp) Sounds.xpGain(state.volume);
     if (leveledUp && state.sndLevelUp) {
-      Sounds.levelUp(state.volume);
-      // Cute mascot quack fires after the fanfare completes (~750ms)
-      setTimeout(() => Sounds.mascotQuack(state.volume), 780);
+      setTimeout(() => {
+        Sounds.levelUp(state.volume);
+        // Cute mascot quack fires after the fanfare completes (~750ms)
+        setTimeout(() => Sounds.mascotQuack(state.volume), 780);
+      }, levelUpDelay);
     }
   }
 
@@ -250,12 +253,18 @@ export const useStore = create<Store>()(
 
         // ── Phase expired ───────────────────────────────────────────────
         if (state.pomoPhase === 'focus') {
-          if (state.sounds && state.sndFocus) Sounds.focusComplete(state.volume);
+          // Focus chime plays 3× over ~4.25 s; duck lofi and delay level-up until after
+          const chimeActive = state.sounds && state.sndFocus;
+          const chimeDuration = 4500; // ms — 3 repeats + buffer
+          if (chimeActive) {
+            Sounds.focusComplete(state.volume);
+            lofiPlayer.duck(chimeDuration);
+          }
 
           const activeTask = state.tasks.find((t) => t.id === state.activeTaskId);
           const statKeys = activeTask?.stats ?? [];
           const sessionXP = (state.cyclePomos + 1) * 25;
-          const updates = gainXP(state, sessionXP, statKeys);
+          const updates = gainXP(state, sessionXP, statKeys, chimeActive ? chimeDuration : 0);
 
           const newCyclePomos = state.cyclePomos + 1;
           const isLongBreak = newCyclePomos >= state.focusInt;

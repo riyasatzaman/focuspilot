@@ -111,6 +111,13 @@ class Mp3Player {
   }
 
   isPlaying() { return this._playing; }
+
+  /** Temporarily lower music volume, then restore after `ms` milliseconds. */
+  duck(ms: number) {
+    if (!this.audio || !this._playing) return;
+    this.audio.volume = this._vol * 0.20;
+    setTimeout(() => { if (this.audio) this.audio.volume = this._vol; }, ms);
+  }
 }
 
 export const lofiPlayer = new Mp3Player();
