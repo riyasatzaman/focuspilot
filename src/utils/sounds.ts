@@ -38,14 +38,17 @@ function note(
   }
 }
 
-/** Focus session complete — ascending triumphant chime */
+/** Focus session complete — ascending triumphant chime, played 3× */
 function focusComplete(vol: number) {
   const v = (vol / 100) * 0.28;
-  note(523.25, 0.00, 0.18, v);
-  note(659.25, 0.14, 0.18, v);
-  note(783.99, 0.28, 0.20, v);
-  note(1046.50, 0.44, 0.55, v);
-  note(1318.51, 0.60, 0.65, v * 0.65);
+  // Each chime lasts ~1.25s; repeat 3 times with a 0.25s gap between
+  [0, 1.5, 3.0].forEach((offset) => {
+    note(523.25,  offset + 0.00, 0.18, v);
+    note(659.25,  offset + 0.14, 0.18, v);
+    note(783.99,  offset + 0.28, 0.20, v);
+    note(1046.50, offset + 0.44, 0.55, v);
+    note(1318.51, offset + 0.60, 0.65, v * 0.65);
+  });
 }
 
 /** Break over — warm descending nudge */
