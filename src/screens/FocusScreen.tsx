@@ -87,7 +87,7 @@ function FocusMiniStats() {
       {/* Stat bars row — click to expand */}
       <div
         onClick={() => setExpanded(e => !e)}
-        style={{ display: 'flex', gap: 6, padding: '8px 16px', cursor: 'pointer', alignItems: 'center' }}
+        style={{ display: 'flex', gap: 6, padding: '10px 16px', cursor: 'pointer', alignItems: 'center' }}
       >
         {STAT_KEYS.map(k => {
           const val = stats[k];
@@ -98,26 +98,28 @@ function FocusMiniStats() {
               key={k}
               style={{
                 flex: 1,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 transition: 'transform 0.15s',
-                transform: isFlashing ? 'scale(1.15)' : 'scale(1)',
+                transform: isFlashing ? 'scale(1.12)' : 'scale(1)',
               }}
             >
-              <div style={{ fontSize: 7, color: isFlashing ? STAT_COLORS[k] : 'var(--text-muted)', letterSpacing: 0.5, transition: 'color 0.15s', whiteSpace: 'nowrap' }}>
-                {STAT_LABELS[k]}
-              </div>
               <div style={{
-                fontSize: 11, fontWeight: 'bold',
-                color: isFlashing ? STAT_COLORS[k] : 'var(--text-sub)',
-                transition: 'color 0.15s',
+                fontSize: 20, fontWeight: 'bold',
+                color: STAT_COLORS[k],
+                transition: 'color 0.15s, text-shadow 0.15s',
+                textShadow: isFlashing ? `0 0 10px ${STAT_COLORS[k]}` : 'none',
+                lineHeight: 1,
               }}>
                 {val}
               </div>
-              <div style={{ width: '100%', height: 2, background: 'var(--border)', borderRadius: 1, overflow: 'hidden' }}>
+              <div style={{ fontSize: 8, color: isFlashing ? STAT_COLORS[k] : 'var(--text-muted)', letterSpacing: 0.5, transition: 'color 0.15s', whiteSpace: 'nowrap', textAlign: 'center' }}>
+                {STAT_LABELS[k]}
+              </div>
+              <div style={{ width: '100%', height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', width: `${barPct}%`,
-                  background: STAT_COLORS[k], borderRadius: 1,
-                  opacity: isFlashing ? 1 : 0.55,
+                  background: STAT_COLORS[k], borderRadius: 2,
+                  opacity: isFlashing ? 1 : 0.7,
                   transition: 'width 0.6s, opacity 0.15s',
                 }} />
               </div>
