@@ -110,12 +110,13 @@ function RecordButton({ enabled, trackName, onToggle, ytThumbUrl }: {
     /* Outer anchor — fixed size, never moves */
     <div data-no-click-sound style={{ position: 'absolute', bottom: 18, right: 18, width: 44, height: 44, zIndex: 10 }}>
 
-      {/* YouTube thumbnail — persistent, shown left of disc when a YouTube custom track is playing */}
+      {/* YouTube thumbnail — floats ABOVE the disc, centred on it */}
       {ytThumbUrl && enabled && (
         <div style={{
           position: 'absolute',
-          right: 52,
-          bottom: 3,
+          bottom: 50,        /* sits above the 44px disc with a small gap */
+          right: -4,         /* right-align with the disc */
+          width: 80,
           pointerEvents: 'none',
           animation: 'fp-thumb-fadein 0.25s ease forwards',
         }}>
@@ -123,23 +124,35 @@ function RecordButton({ enabled, trackName, onToggle, ytThumbUrl }: {
             src={ytThumbUrl}
             alt="Now playing"
             style={{
-              width: 62,
-              height: 42,
+              width: 80,
+              height: 54,
               objectFit: 'cover',
-              borderRadius: 5,
-              border: '1.5px solid #a855f7',
-              boxShadow: '0 0 10px rgba(168,85,247,0.45), 0 2px 10px rgba(0,0,0,0.6)',
+              borderRadius: 6,
+              border: '2px solid #a855f7',
+              boxShadow: '0 0 14px rgba(168,85,247,0.5), 0 4px 14px rgba(0,0,0,0.55)',
               display: 'block',
             }}
           />
-          {/* ▶ PLAYING badge */}
+          {/* ▶ badge top-left */}
           <div style={{
-            position: 'absolute', bottom: 4, left: 4,
-            fontSize: 6, color: '#fff', letterSpacing: 0.5,
-            background: 'rgba(168,85,247,0.88)',
-            borderRadius: 2, padding: '1px 4px',
+            position: 'absolute', top: 4, left: 4,
+            fontSize: 7, color: '#fff', letterSpacing: 0.5,
+            background: 'rgba(168,85,247,0.9)',
+            borderRadius: 2, padding: '1px 5px',
             fontFamily: 'inherit',
-          }}>▶ PLAYING</div>
+          }}>▶</div>
+          {/* Track name below thumbnail */}
+          <div style={{
+            marginTop: 4,
+            fontSize: 7,
+            color: '#a855f7',
+            letterSpacing: 0.5,
+            textAlign: 'right',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            maxWidth: 80,
+          }}>{trackName}</div>
         </div>
       )}
 
