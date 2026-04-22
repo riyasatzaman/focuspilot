@@ -276,7 +276,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-start', flex:1, padding:'32px 24px', gap:14, overflowY:'auto' }}>
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flex:1, padding:'32px 24px', gap:14 }}>
 
       {/* Theme toggle — bottom-left, mirrors record player */}
       <ThemeButton theme={theme} onToggle={toggleTheme} />
