@@ -84,6 +84,8 @@ function ThemeButton({ theme, onToggle }: { theme: string; onToggle: () => void 
 }
 
 // ── Record player + sliding mini-player ──────────────────────────────────────
+const PILL_W = 204; // total expanded width in px (left content + 44px disc)
+
 function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
   enabled: boolean;
   trackName: string;
@@ -94,139 +96,103 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
   const [expanded, setExpanded] = useState(false);
   const collapseRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Expand when music starts, collapse when it stops
-  useEffect(() => {
-    if (enabled) {
-      setExpanded(true);
-      scheduleCollapse();
-    } else {
-      setExpanded(false);
-      clearCollapse();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
-
   function clearCollapse() {
     if (collapseRef.current) { clearTimeout(collapseRef.current); collapseRef.current = null; }
   }
   function scheduleCollapse() {
     clearCollapse();
-    collapseRef.current = setTimeout(() => setExpanded(false), 3000);
+    collapseRef.current = setTimeout(() => setExpanded(false), 1800);
   }
 
-  function handleMouseEnter() {
-    clearCollapse();
-    if (enabled) setExpanded(true);
-  }
-  function handleMouseLeave() {
-    if (enabled) scheduleCollapse();
-  }
-  function handleDiscClick() {
-    onToggle();
-    if (!enabled) { setExpanded(true); scheduleCollapse(); }
-  }
-  function handleControlClick(fn: () => void) {
-    fn();
-    // Reset collapse timer whenever controls are used
-    if (enabled) scheduleCollapse();
-  }
-
-  const PILL_W = 152; // px — inner content width
+  // Hover-only expand/collapse (hover = expand, leave = collapse after delay)
+  function handleMouseEnter() { clearCollapse(); setExpanded(true); }
+  function handleMouseLeave() { scheduleCollapse(); }
 
   return (
     <div
       data-no-click-sound
-      style={{
-        position: 'absolute', bottom: 18, right: 18,
-        display: 'flex', alignItems: 'center', zIndex: 10,
-      }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-    >
-      {/* ── Sliding pill ──────────────────────────────────────────── */}
-      {/* Overflow-hidden wrapper drives the slide animation */}
-      <div style={{
-        width: expanded ? PILL_W : 0,
+      style={{
+        position: 'absolute', bottom: 18, right: 18,
+        height: 44,
+        width: expanded ? PILL_W : 44,
+        borderRadius: 22,
         overflow: 'hidden',
-        transition: 'width 0.32s cubic-bezier(0.4, 0, 0.2, 1)',
-        flexShrink: 0,
+        background: expanded ? 'rgba(10, 6, 22, 0.91)' : 'transparent',
+        /* Very subtle border — barely visible, avoids heavy purple outline */
+        boxShadow: expanded ? 'inset 0 0 0 1px rgba(255,255,255,0.07), 0 4px 24px rgba(0,0,0,0.45)' : 'none',
+        transition: 'width 0.30s cubic-bezier(0.4,0,0.2,1), background 0.30s, box-shadow 0.30s',
+        display: 'flex',
+        alignItems: 'center',
+        zIndex: 10,
+        backdropFilter: expanded ? 'blur(14px)' : 'none',
+        WebkitBackdropFilter: expanded ? 'blur(14px)' : 'none',
+      }}
+    >
+      {/* ── Left sliding content ───────────────────────────────────── */}
+      {/* opacity fade keeps content invisible while pill is narrow */}
+      <div style={{
+        flex: 1, minWidth: 0,
+        display: 'flex', alignItems: 'center', gap: 8,
+        paddingLeft: 10, paddingRight: 6,
+        opacity: expanded ? 1 : 0,
+        transition: 'opacity 0.18s',
       }}>
-        {/* Fixed-width inner pill — rounded left, flat right (merges with disc) */}
+        {/* Circular album art */}
         <div style={{
-          width: PILL_W,
-          height: 44,
-          background: 'rgba(12, 8, 26, 0.90)',
-          border: '1.5px solid rgba(168,85,247,0.5)',
-          borderRight: 'none',
-          borderRadius: '22px 0 0 22px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          paddingLeft: 8,
-          paddingRight: 12,
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          boxSizing: 'border-box',
+          width: 28, height: 28, borderRadius: '50%',
+          overflow: 'hidden', flexShrink: 0,
+          background: 'rgba(168,85,247,0.12)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
+          {ytThumbUrl
+            ? <img src={ytThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <span style={{ fontSize: 12, color: 'rgba(168,85,247,0.7)' }}>♪</span>
+          }
+        </div>
 
-          {/* Circular album art / thumbnail */}
-          <div style={{
-            width: 30, height: 30, borderRadius: '50%',
-            overflow: 'hidden', flexShrink: 0,
-            border: '1.5px solid rgba(168,85,247,0.7)',
-            background: 'rgba(168,85,247,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            {ytThumbUrl
-              ? <img src={ytThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <span style={{ fontSize: 13, color: '#a855f7' }}>♪</span>
-            }
-          </div>
+        {/* Track name */}
+        <div style={{
+          flex: 1, minWidth: 0,
+          fontSize: 8, color: 'rgba(210,175,255,0.85)', letterSpacing: 0.6,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {trackName}
+        </div>
 
-          {/* Track name */}
-          <div style={{
-            flex: 1, minWidth: 0,
-            fontSize: 8, color: 'rgba(200,160,255,0.95)', letterSpacing: 0.5,
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}>
-            {trackName}
-          </div>
-
-          {/* Controls: pause/play + next */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
-            <button
-              onClick={() => handleControlClick(onToggle)}
-              style={{
-                background: 'transparent', border: 'none',
-                color: '#a855f7', fontSize: 14, lineHeight: 1,
-                cursor: 'pointer', padding: '4px 6px',
-              }}
-              title={enabled ? 'Pause' : 'Play'}
-            >{enabled ? '⏸' : '▶'}</button>
-            <button
-              onClick={() => handleControlClick(onNext)}
-              style={{
-                background: 'transparent', border: 'none',
-                color: 'rgba(168,85,247,0.65)', fontSize: 12, lineHeight: 1,
-                cursor: 'pointer', padding: '4px 6px',
-              }}
-              title="Next track"
-            >⏭</button>
-          </div>
+        {/* ⏸ / ▶  and  ⏭ */}
+        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <button
+            onClick={onToggle}
+            style={{
+              background: 'transparent', border: 'none',
+              color: 'rgba(180,130,255,0.9)', fontSize: 13, lineHeight: 1,
+              cursor: 'pointer', padding: '4px 7px',
+            }}
+            title={enabled ? 'Pause' : 'Play'}
+          >{enabled ? '⏸' : '▶'}</button>
+          <button
+            onClick={onNext}
+            style={{
+              background: 'transparent', border: 'none',
+              color: 'rgba(168,85,247,0.55)', fontSize: 11, lineHeight: 1,
+              cursor: 'pointer', padding: '4px 6px',
+            }}
+            title="Next track"
+          >⏭</button>
         </div>
       </div>
 
-      {/* ── Record disc (always visible) ─────────────────────────── */}
+      {/* ── Disc — fixed 44 px, acts as the right rounded cap ─────── */}
       <button
-        onClick={handleDiscClick}
+        onClick={onToggle}
         title={enabled ? 'Stop music' : 'Play lo-fi music'}
         style={{
           background: 'none', border: 'none', padding: 3,
-          cursor: 'pointer', display: 'flex', flexShrink: 0,
-          /* Left edge of disc merges with pill when expanded */
-          borderLeft: expanded ? '1.5px solid rgba(168,85,247,0.5)' : 'none',
-          marginLeft: expanded ? -1 : 0,
-          transition: 'border-left 0.32s, margin-left 0.32s',
+          cursor: 'pointer', display: 'flex',
+          width: 44, height: 44, flexShrink: 0,
+          alignItems: 'center', justifyContent: 'center',
         }}
       >
         <svg
