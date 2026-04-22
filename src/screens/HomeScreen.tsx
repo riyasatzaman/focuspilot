@@ -84,7 +84,7 @@ function ThemeButton({ theme, onToggle }: { theme: string; onToggle: () => void 
 }
 
 // ── Record player + sliding mini-player ──────────────────────────────────────
-const PILL_W = 160; // pill content width (disc NOT included)
+const PILL_CONTENT_W = 160; // left-section width (disc adds another 44 px)
 
 function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
   enabled: boolean;
@@ -108,9 +108,10 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
 
   return (
     /*
-     * Outer row: position:absolute right:18 — disc is the rightmost child.
-     * The disc is a sibling of the pill wrapper, NOT inside it, so it is
-     * never clipped by overflow:hidden and never moves.
+     * Key insight: overflow:hidden is NOT on the outer shell — only on the
+     * left-content section. The outer shell uses border-radius alone for its
+     * pill shape. This lets the disc's drop-shadow render freely past the
+     * right edge so it is never clipped or pushed off-screen.
      */
     <div
       data-no-click-sound
@@ -118,88 +119,82 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
       onMouseLeave={handleMouseLeave}
       style={{
         position: 'absolute', bottom: 18, right: 18,
-        display: 'flex', alignItems: 'center',
+        height: 44,
+        width: expanded ? PILL_CONTENT_W + 44 : 44,
+        borderRadius: 22,
+        /* background + shadow only via border-radius — no overflow:hidden needed */
+        background: expanded ? 'rgba(10,6,22,0.92)' : 'transparent',
+        boxShadow: expanded
+          ? 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 20px rgba(0,0,0,0.4)'
+          : 'none',
+        backdropFilter: expanded ? 'blur(14px)' : 'none',
+        WebkitBackdropFilter: expanded ? 'blur(14px)' : 'none',
+        transition: 'width 0.30s cubic-bezier(0.4,0,0.2,1), background 0.30s, box-shadow 0.30s',
+        display: 'flex',
+        alignItems: 'center',
         zIndex: 10,
       }}
     >
-      {/* ── Pill — overflow:hidden clips content; disc is outside ─── */}
+      {/* ── Left content — overflow:hidden here clips the slide animation ── */}
       <div style={{
-        width: expanded ? PILL_W : 0,
-        height: 44,
-        overflow: 'hidden',
-        flexShrink: 0,
-        transition: 'width 0.30s cubic-bezier(0.4,0,0.2,1)',
-        /* Right-align content so pill retracts INTO the disc, not away */
+        flex: 1,
+        minWidth: 0,
+        height: '100%',
+        overflow: 'hidden',          /* clips only this section, not the disc */
         display: 'flex',
-        justifyContent: 'flex-end',
+        alignItems: 'center',
+        gap: 8,
+        paddingLeft: 12,
+        paddingRight: 8,
+        opacity: expanded ? 1 : 0,
+        transition: 'opacity 0.18s',
       }}>
-        {/* Inner pill — fixed width, right-anchored */}
+        {/* Circular album art */}
         <div style={{
-          width: PILL_W,
-          height: 44,
-          flexShrink: 0,
-          background: 'rgba(10,6,22,0.92)',
-          borderRadius: '22px 0 0 22px',
-          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 20px rgba(0,0,0,0.4)',
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          paddingLeft: 12,
-          paddingRight: 10,
-          boxSizing: 'border-box',
-          /* Fade content in slightly after pill starts opening */
-          opacity: expanded ? 1 : 0,
-          transition: 'opacity 0.15s',
+          width: 28, height: 28, borderRadius: '50%',
+          overflow: 'hidden', flexShrink: 0,
+          background: 'rgba(168,85,247,0.10)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          {/* Circular album art */}
-          <div style={{
-            width: 28, height: 28, borderRadius: '50%',
-            overflow: 'hidden', flexShrink: 0,
-            background: 'rgba(168,85,247,0.10)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            {ytThumbUrl
-              ? <img src={ytThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <span style={{ fontSize: 12, color: 'rgba(168,85,247,0.65)' }}>♪</span>
-            }
-          </div>
+          {ytThumbUrl
+            ? <img src={ytThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            : <span style={{ fontSize: 12, color: 'rgba(168,85,247,0.65)' }}>♪</span>
+          }
+        </div>
 
-          {/* Track name */}
-          <div style={{
-            flex: 1, minWidth: 0,
-            fontSize: 8, color: 'rgba(210,175,255,0.82)', letterSpacing: 0.6,
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}>
-            {trackName}
-          </div>
+        {/* Track name */}
+        <div style={{
+          flex: 1, minWidth: 0,
+          fontSize: 8, color: 'rgba(210,175,255,0.82)', letterSpacing: 0.6,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {trackName}
+        </div>
 
-          {/* ⏸/▶ and ⏭ */}
-          <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <button
-              onClick={onToggle}
-              style={{
-                background: 'transparent', border: 'none',
-                color: 'rgba(180,130,255,0.9)', fontSize: 13, lineHeight: 1,
-                cursor: 'pointer', padding: '4px 7px',
-              }}
-              title={enabled ? 'Pause' : 'Play'}
-            >{enabled ? '⏸' : '▶'}</button>
-            <button
-              onClick={onNext}
-              style={{
-                background: 'transparent', border: 'none',
-                color: 'rgba(168,85,247,0.5)', fontSize: 11, lineHeight: 1,
-                cursor: 'pointer', padding: '4px 6px',
-              }}
-              title="Next track"
-            >⏭</button>
-          </div>
+        {/* ⏸/▶  ⏭ */}
+        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <button
+            onClick={onToggle}
+            style={{
+              background: 'transparent', border: 'none',
+              color: 'rgba(180,130,255,0.9)', fontSize: 13, lineHeight: 1,
+              cursor: 'pointer', padding: '4px 7px',
+            }}
+            title={enabled ? 'Pause' : 'Play'}
+          >{enabled ? '⏸' : '▶'}</button>
+          <button
+            onClick={onNext}
+            style={{
+              background: 'transparent', border: 'none',
+              color: 'rgba(168,85,247,0.5)', fontSize: 11, lineHeight: 1,
+              cursor: 'pointer', padding: '4px 6px',
+            }}
+            title="Next track"
+          >⏭</button>
         </div>
       </div>
 
-      {/* ── Disc — always outside overflow:hidden, never clips ─────── */}
+      {/* ── Disc — the right rounded cap; glow is never clipped ──────── */}
       <button
         onClick={onToggle}
         title={enabled ? 'Stop music' : 'Play lo-fi music'}
