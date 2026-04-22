@@ -414,6 +414,8 @@ body {
 /* ── App shell: base style (dark) + light override ───────────────────────── */
 .fp-app-shell {
   background: var(--bg);
+  overflow-x: clip;   /* clips horizontal bleed without locking y-axis */
+  overflow-y: visible; /* lets the timer bubble overflow above when needed */
 }
 /* In light mode the app shell is transparent so the body gradient flows through
    seamlessly — no visible rectangular panel / box-within-a-box effect. */

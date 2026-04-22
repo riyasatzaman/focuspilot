@@ -121,7 +121,6 @@ export default function App() {
           maxWidth: 390,
           width: '100%',
           borderRadius: 0,
-          overflow: 'hidden',
           fontFamily: "'Courier New', Courier, monospace",
           display: 'flex',
           flexDirection: 'column',
