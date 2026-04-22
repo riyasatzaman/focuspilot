@@ -84,7 +84,7 @@ function ThemeButton({ theme, onToggle }: { theme: string; onToggle: () => void 
 }
 
 // ── Record player + sliding mini-player ──────────────────────────────────────
-const PILL_CONTENT_W = 160; // left-section width (disc adds another 44 px)
+const PILL_W = 160; // pill content width; disc (44 px) is always separate
 
 function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
   enabled: boolean;
@@ -108,10 +108,15 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
 
   return (
     /*
-     * Key insight: overflow:hidden is NOT on the outer shell — only on the
-     * left-content section. The outer shell uses border-radius alone for its
-     * pill shape. This lets the disc's drop-shadow render freely past the
-     * right edge so it is never clipped or pushed off-screen.
+     * The outer anchor is ALWAYS 44×44 — its size never changes, so it can
+     * never shift surrounding elements regardless of expanded/collapsed state.
+     *
+     * The pill is absolutely positioned OUTSIDE the anchor (to its left) and
+     * slides via transform:translateX — CSS transforms are GPU-composited and
+     * have zero layout impact on sibling/parent elements.
+     *
+     * The disc lives inside the 44×44 anchor with no overflow:hidden above it,
+     * so its drop-shadow glow is never clipped.
      */
     <div
       data-no-click-sound
@@ -119,36 +124,36 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
       onMouseLeave={handleMouseLeave}
       style={{
         position: 'absolute', bottom: 18, right: 18,
-        height: 44,
-        width: expanded ? PILL_CONTENT_W + 44 : 44,
-        borderRadius: 22,
-        /* background + shadow only via border-radius — no overflow:hidden needed */
-        background: expanded ? 'rgba(10,6,22,0.92)' : 'transparent',
-        boxShadow: expanded
-          ? 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 20px rgba(0,0,0,0.4)'
-          : 'none',
-        backdropFilter: expanded ? 'blur(14px)' : 'none',
-        WebkitBackdropFilter: expanded ? 'blur(14px)' : 'none',
-        transition: 'width 0.30s cubic-bezier(0.4,0,0.2,1), background 0.30s, box-shadow 0.30s',
-        display: 'flex',
-        alignItems: 'center',
+        width: 44, height: 44,   /* NEVER changes */
         zIndex: 10,
       }}
     >
-      {/* ── Left content — overflow:hidden here clips the slide animation ── */}
-      <div style={{
-        flex: 1,
-        minWidth: 0,
-        height: '100%',
-        overflow: 'hidden',          /* clips only this section, not the disc */
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        paddingLeft: 12,
-        paddingRight: 8,
-        opacity: expanded ? 1 : 0,
-        transition: 'opacity 0.18s',
-      }}>
+      {/* ── Pill — lives OUTSIDE the 44×44 anchor ───────────────────
+          right:44  →  its right edge is flush with the anchor's left edge
+          translateX(PILL_W) when collapsed = visually hidden behind disc
+          translateX(0)      when expanded  = fully visible to the left    */}
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          position: 'absolute',
+          right: 44,
+          top: 0,
+          width: PILL_W,
+          height: 44,
+          overflow: 'hidden',
+          background: 'rgba(10,6,22,0.95)',
+          borderRadius: '22px 0 0 22px',
+          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 20px rgba(0,0,0,0.35)',
+          display: 'flex', alignItems: 'center',
+          gap: 8, paddingLeft: 12, paddingRight: 10,
+          /* Transform slide — zero layout impact */
+          transform: expanded ? 'translateX(0)' : `translateX(${PILL_W}px)`,
+          opacity: expanded ? 1 : 0,
+          transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.18s',
+          pointerEvents: expanded ? 'auto' : 'none',
+        }}
+      >
         {/* Circular album art */}
         <div style={{
           width: 28, height: 28, borderRadius: '50%',
@@ -194,13 +199,14 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
         </div>
       </div>
 
-      {/* ── Disc — the right rounded cap; glow is never clipped ──────── */}
+      {/* ── Disc — inside the 44×44 anchor, never clipped ─────────── */}
       <button
         onClick={onToggle}
         title={enabled ? 'Stop music' : 'Play lo-fi music'}
         style={{
+          position: 'absolute', right: 0, top: 0,
           background: 'none', border: 'none', padding: 3,
-          cursor: 'pointer', display: 'flex', flexShrink: 0,
+          cursor: 'pointer', display: 'flex',
           width: 44, height: 44,
           alignItems: 'center', justifyContent: 'center',
         }}
