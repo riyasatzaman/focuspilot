@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { Sounds } from '../utils/sounds';
-import { LOFI_TRACKS } from '../utils/lofi';
+import { LOFI_TRACKS, customAudioMap } from '../utils/lofi';
+import { extractYoutubeId, youtubeThumbnail } from '../utils/youtubePlayer';
 import { exportBackup, validateBackup } from '../utils/backup';
 import Toast from '../components/Toast';
 import PilotDuck from '../components/PilotDuck';
@@ -30,15 +31,25 @@ export default function SettingsScreen() {
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingImport, setPendingImport] = useState<AppState | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef  = useRef<HTMLInputElement>(null);
+  const audioFileRef  = useRef<HTMLInputElement>(null);
+
+  // Custom track / YouTube add state
+  const [ytAdding,   setYtAdding]   = useState(false);
+  const [ytInput,    setYtInput]    = useState('');
+  const [ytName,     setYtName]     = useState('');
+  const [ytPreviewId, setYtPreviewId] = useState<string | null>(null);
+  const [ytFetching, setYtFetching] = useState(false);
 
   const {
     sounds, notifs, volume, focusDur, breakDur, focusInt, longBreakDur,
     sndFocus, sndBreak, sndLevelUp, sndXp, sndTask,
     theme, lofiEnabled, lofiTrack, level,
+    customTracks, lofiCustomId,
     setSounds, setNotifs, setVolume, setFocusDur, setBreakDur, setFocusInt, setLongBreakDur,
     setSndFocus, setSndBreak, setSndLevelUp, setSndXp, setSndTask,
     toggleTheme, setScreen, setLofiEnabled, setLofiTrack, replaceState,
+    addCustomTrack, removeCustomTrack, setLofiCustomId,
   } = useStore();
 
   function handleExport() {
@@ -87,6 +98,62 @@ export default function SettingsScreen() {
     setConfirmOpen(false);
   }
 
+  // ── Custom audio file upload ───────────────────────────────────────────────
+  function handleAudioFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = '';
+    const id  = Date.now();
+    const url = URL.createObjectURL(file);
+    customAudioMap.set(id, url);
+    addCustomTrack({ id, name: file.name.replace(/\.[^.]+$/, ''), type: 'file', fileName: file.name });
+    setLofiCustomId(id);
+    setLofiEnabled(true);
+    setToast({ msg: 'Track added', ok: true });
+  }
+
+  // ── YouTube URL handling ───────────────────────────────────────────────────
+  async function handleYtUrlChange(val: string) {
+    setYtInput(val);
+    const id = extractYoutubeId(val.trim());
+    if (id) {
+      setYtPreviewId(id);
+      setYtFetching(true);
+      setYtName('');
+      try {
+        const res  = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`);
+        if (res.ok) {
+          const data = await res.json() as { title?: string };
+          setYtName(data.title ?? '');
+        }
+      } catch { /* ignore */ } finally {
+        setYtFetching(false);
+      }
+    } else {
+      setYtPreviewId(null);
+    }
+  }
+
+  function handleAddYouTube() {
+    if (!ytPreviewId) return;
+    const id = Date.now();
+    addCustomTrack({ id, name: ytName.trim() || ytPreviewId, type: 'youtube', youtubeId: ytPreviewId });
+    setLofiCustomId(id);
+    setLofiEnabled(true);
+    setYtAdding(false);
+    setYtInput('');
+    setYtName('');
+    setYtPreviewId(null);
+    setToast({ msg: 'YouTube track added', ok: true });
+  }
+
+  function cancelYtAdding() {
+    setYtAdding(false);
+    setYtInput('');
+    setYtName('');
+    setYtPreviewId(null);
+  }
+
   const sndValues: Record<SndKey, boolean> = { sndFocus, sndBreak, sndLevelUp, sndXp, sndTask };
   const sndSetters: Record<SndKey, (v: boolean) => void> = {
     sndFocus: setSndFocus,
@@ -100,13 +167,20 @@ export default function SettingsScreen() {
 
   return (
     <div style={{ display:'flex', flexDirection:'column', flex:1, minHeight:0 }}>
-      {/* Hidden file input */}
+      {/* Hidden file inputs */}
       <input
         ref={fileInputRef}
         type="file"
         accept=".json"
         style={{ display:'none' }}
         onChange={handleFileChange}
+      />
+      <input
+        ref={audioFileRef}
+        type="file"
+        accept="audio/*"
+        style={{ display:'none' }}
+        onChange={handleAudioFileChange}
       />
 
       {/* Toast */}
@@ -313,6 +387,151 @@ export default function SettingsScreen() {
                 </button>
               ))}
             </div>
+
+            {/* ── Custom Tracks ─────────────────────────────────────── */}
+            <div style={{ height:1, background:'var(--border)' }} />
+            <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>CUSTOM TRACKS</div>
+
+            {/* Existing custom track list */}
+            {customTracks.length > 0 && (
+              <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+                {customTracks.map((ct) => {
+                  const isActive = lofiCustomId === ct.id;
+                  const isYt = ct.type === 'youtube' && ct.youtubeId;
+                  return (
+                    <div key={ct.id} style={{
+                      display:'flex', alignItems:'center', gap:8,
+                      background: isActive ? 'rgba(168,85,247,0.10)' : 'transparent',
+                      border:`1.5px solid ${isActive ? '#a855f7' : 'var(--border)'}`,
+                      borderRadius:5, padding:'7px 10px', transition:'border 0.15s, background 0.15s',
+                    }}>
+                      {/* Thumbnail or file icon */}
+                      {isYt ? (
+                        <img
+                          src={youtubeThumbnail(ct.youtubeId!)}
+                          alt=""
+                          style={{ width:36, height:25, objectFit:'cover', borderRadius:2, flexShrink:0 }}
+                        />
+                      ) : (
+                        <div style={{ width:36, height:25, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'var(--text-muted)', fontSize:16 }}>
+                          🎵
+                        </div>
+                      )}
+                      {/* Track info */}
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:10, color: isActive ? '#a855f7' : 'var(--text)', letterSpacing:0.5, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                          {ct.name}
+                        </div>
+                        <div style={{ fontSize:8, color:'var(--text-muted)', marginTop:1 }}>
+                          {ct.type === 'youtube' ? 'YouTube' : 'File'}
+                        </div>
+                      </div>
+                      {isActive && lofiEnabled && (
+                        <div style={{ fontSize:8, color:'#a855f7', letterSpacing:1, flexShrink:0 }}>PLAYING</div>
+                      )}
+                      {/* Play / stop */}
+                      <button
+                        onClick={() => {
+                          if (isActive) { setLofiCustomId(null); }
+                          else { setLofiCustomId(ct.id); setLofiEnabled(true); }
+                        }}
+                        style={{
+                          background:'transparent', border:'1px solid var(--border)',
+                          borderRadius:4, color: isActive ? '#a855f7' : 'var(--text-muted)',
+                          fontFamily:'inherit', fontSize:11, padding:'4px 8px', cursor:'pointer',
+                        }}
+                        title={isActive ? 'Stop' : 'Play'}
+                      >{isActive ? '⏸' : '▶'}</button>
+                      {/* Delete */}
+                      <button
+                        onClick={() => removeCustomTrack(ct.id)}
+                        style={{
+                          background:'transparent', border:'1px solid rgba(233,69,96,0.3)',
+                          borderRadius:4, color:'#e94560', fontFamily:'inherit',
+                          fontSize:11, padding:'4px 8px', cursor:'pointer',
+                        }}
+                        title="Remove"
+                      >✕</button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Add buttons */}
+            {!ytAdding && (
+              <div style={{ display:'flex', gap:8 }}>
+                <button
+                  onClick={() => audioFileRef.current?.click()}
+                  className="fp-btn fp-btn-mu"
+                  style={{ flex:1, fontSize:9, padding:'8px 0' }}
+                >+ FROM FILE</button>
+                <button
+                  onClick={() => setYtAdding(true)}
+                  className="fp-btn fp-btn-mu"
+                  style={{ flex:1, fontSize:9, padding:'8px 0' }}
+                >+ YOUTUBE</button>
+              </div>
+            )}
+
+            {/* YouTube add form */}
+            {ytAdding && (
+              <div style={{ display:'flex', flexDirection:'column', gap:10, background:'var(--surface)', border:'1px solid var(--border)', borderRadius:6, padding:12 }}>
+                <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>YOUTUBE URL OR VIDEO ID</div>
+                <input
+                  type="text"
+                  value={ytInput}
+                  onChange={e => handleYtUrlChange(e.target.value)}
+                  placeholder="youtube.com/watch?v=..."
+                  style={{
+                    background:'var(--bg)', border:'1px solid var(--border)', borderRadius:4,
+                    color:'var(--text)', fontFamily:'inherit', fontSize:10,
+                    padding:'7px 10px', outline:'none',
+                  }}
+                />
+                {ytPreviewId && (
+                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                    <img
+                      src={youtubeThumbnail(ytPreviewId)}
+                      alt="thumbnail"
+                      style={{ width:64, height:44, objectFit:'cover', borderRadius:3, border:'1px solid rgba(168,85,247,0.3)' }}
+                    />
+                    <div style={{ fontSize:8, color:'var(--text-muted)', lineHeight:1.5 }}>
+                      {ytFetching ? 'Fetching title…' : 'Valid video found'}
+                    </div>
+                  </div>
+                )}
+                {ytPreviewId && (
+                  <>
+                    <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>TRACK NAME</div>
+                    <input
+                      type="text"
+                      value={ytName}
+                      onChange={e => setYtName(e.target.value)}
+                      placeholder={ytFetching ? 'Loading…' : 'Enter a name…'}
+                      style={{
+                        background:'var(--bg)', border:'1px solid var(--border)', borderRadius:4,
+                        color:'var(--text)', fontFamily:'inherit', fontSize:10,
+                        padding:'7px 10px', outline:'none',
+                      }}
+                    />
+                  </>
+                )}
+                <div style={{ display:'flex', gap:8 }}>
+                  <button onClick={cancelYtAdding} className="fp-btn fp-btn-mu" style={{ flex:1, fontSize:9, padding:'7px 0' }}>
+                    CANCEL
+                  </button>
+                  <button
+                    onClick={handleAddYouTube}
+                    disabled={!ytPreviewId || ytFetching}
+                    className="fp-btn fp-btn-p"
+                    style={{ flex:1, fontSize:9, padding:'7px 0', opacity: ytPreviewId && !ytFetching ? 1 : 0.4, cursor: ytPreviewId && !ytFetching ? 'pointer' : 'not-allowed' }}
+                  >
+                    ADD
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div style={{ height:1, background:'var(--border)' }} />
             <div style={{ fontSize:9, color:'var(--text-muted)', letterSpacing:1 }}>INDIVIDUAL SOUNDS</div>

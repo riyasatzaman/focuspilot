@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppState, Task, CountdownEvent, Note, StatKey, Reward } from '../types';
+import type { AppState, Task, CountdownEvent, Note, StatKey, Reward, CustomTrack } from '../types';
 import { BASE_CATS } from '../constants/categories';
 import { xpInfo } from '../constants/levels';
 import { Sounds } from '../utils/sounds';
@@ -49,6 +49,9 @@ interface StoreActions {
   clearNlog: () => void;
   setLofiEnabled: (v: boolean) => void;
   setLofiTrack: (v: number) => void;
+  addCustomTrack: (track: CustomTrack) => void;
+  removeCustomTrack: (id: number) => void;
+  setLofiCustomId: (id: number | null) => void;
   replaceState: (data: AppState) => void;
   setHasSeenOnboarding: (v: boolean) => void;
   setHasInitializedContent: (v: boolean) => void;
@@ -161,6 +164,8 @@ export const useStore = create<Store>()(
       theme: 'dark',
       lofiEnabled: false,
       lofiTrack: 0,
+      customTracks: [],
+      lofiCustomId: null,
       screen: 'home',
       activeNoteId: null,
       hasSeenOnboarding: false,
@@ -431,6 +436,12 @@ export const useStore = create<Store>()(
       // ── Lo-fi music ───────────────────────────────────────────────────
       setLofiEnabled: (v) => set({ lofiEnabled: v }),
       setLofiTrack:   (v) => set({ lofiTrack: v }),
+      addCustomTrack: (track) => set((s) => ({ customTracks: [...s.customTracks, track] })),
+      removeCustomTrack: (id) => set((s) => ({
+        customTracks: s.customTracks.filter((t) => t.id !== id),
+        lofiCustomId: s.lofiCustomId === id ? null : s.lofiCustomId,
+      })),
+      setLofiCustomId: (id) => set({ lofiCustomId: id }),
 
       // ── Backup / restore ──────────────────────────────────────────────
       replaceState: (data) => set({

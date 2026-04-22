@@ -50,6 +50,14 @@ export interface Reward {
   cost: number;
 }
 
+export interface CustomTrack {
+  id: number;
+  name: string;
+  type: 'file' | 'youtube';
+  youtubeId?: string;  // YouTube video ID (persisted)
+  fileName?: string;   // original filename for display (file type)
+}
+
 export interface AppState {
   // Data
   tasks: Task[];
@@ -96,6 +104,8 @@ export interface AppState {
   // Lo-fi music
   lofiEnabled: boolean;
   lofiTrack: number;
+  customTracks: CustomTrack[];
+  lofiCustomId: number | null; // null = built-in track, number = custom track id
 
   // Navigation
   screen: string;

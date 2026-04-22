@@ -6,6 +6,7 @@ import StatGrid from '../components/StatGrid';
 import { xpInfo } from '../constants/levels';
 import { Sounds } from '../utils/sounds';
 import { LOFI_TRACKS } from '../utils/lofi';
+import { youtubeThumbnail } from '../utils/youtubePlayer';
 
 function pad(n: number) { return String(n).padStart(2, '0'); }
 
@@ -83,14 +84,19 @@ function ThemeButton({ theme, onToggle }: { theme: string; onToggle: () => void 
 }
 
 // ── Record player button ──────────────────────────────────────────────────────
-function RecordButton({ enabled, trackName, onToggle }: { enabled: boolean; trackName: string; onToggle: () => void }) {
+function RecordButton({ enabled, trackName, onToggle, ytThumbUrl }: {
+  enabled: boolean;
+  trackName: string;
+  onToggle: () => void;
+  ytThumbUrl?: string;
+}) {
   const [showLabel, setShowLabel] = useState(false);
   const labelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClick = () => {
     onToggle();
-    // Show track name label for 3s on play, hide on stop
-    if (!enabled) {
+    // Show track name label for 3s on play, hide on stop (only for non-YouTube tracks)
+    if (!enabled && !ytThumbUrl) {
       setShowLabel(true);
       if (labelTimerRef.current) clearTimeout(labelTimerRef.current);
       labelTimerRef.current = setTimeout(() => setShowLabel(false), 3000);
@@ -104,8 +110,40 @@ function RecordButton({ enabled, trackName, onToggle }: { enabled: boolean; trac
     /* Outer anchor — fixed size, never moves */
     <div data-no-click-sound style={{ position: 'absolute', bottom: 18, right: 18, width: 44, height: 44, zIndex: 10 }}>
 
-      {/* Track name label — absolutely to the LEFT of the disc, disc never shifts */}
-      {showLabel && (
+      {/* YouTube thumbnail — persistent, shown left of disc when a YouTube custom track is playing */}
+      {ytThumbUrl && enabled && (
+        <div style={{
+          position: 'absolute',
+          right: 50,
+          bottom: 4,
+          pointerEvents: 'none',
+          animation: 'fp-fadein 0.3s ease forwards',
+        }}>
+          <img
+            src={ytThumbUrl}
+            alt="Now playing"
+            style={{
+              width: 50,
+              height: 34,
+              objectFit: 'cover',
+              borderRadius: 4,
+              border: '1px solid rgba(168,85,247,0.45)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.55)',
+              display: 'block',
+            }}
+          />
+          {/* Subtle "playing" shimmer bar at the bottom of the thumbnail */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
+            background: 'linear-gradient(90deg, transparent, #a855f7, transparent)',
+            borderRadius: '0 0 4px 4px',
+            animation: 'fp-shimmer 2s linear infinite',
+          }} />
+        </div>
+      )}
+
+      {/* Track name label — shown for built-in / file tracks (not YouTube) */}
+      {showLabel && !ytThumbUrl && (
         <div style={{
           position: 'absolute',
           right: 50,   /* sits just left of the 44px disc */
@@ -240,8 +278,17 @@ export default function HomeScreen() {
   const dialogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const duckDivRef = useRef<HTMLDivElement>(null);
 
-  const { xp, level, points, stats, setScreen, toggleTheme, theme, sounds, volume, rewards, addReward, deleteReward, redeemReward, lofiEnabled, setLofiEnabled, lofiTrack, pomoRunning, pomoSecs, pomoPhase } = useStore();
+  const { xp, level, points, stats, setScreen, toggleTheme, theme, sounds, volume, rewards, addReward, deleteReward, redeemReward, lofiEnabled, setLofiEnabled, lofiTrack, pomoRunning, pomoSecs, pomoPhase, customTracks, lofiCustomId } = useStore();
   const info = xpInfo(xp);
+
+  // Determine active custom track info for the record button
+  const activeCustomTrack = customTracks.find(t => t.id === lofiCustomId);
+  const ytThumbUrl = activeCustomTrack?.type === 'youtube' && activeCustomTrack.youtubeId
+    ? youtubeThumbnail(activeCustomTrack.youtubeId)
+    : undefined;
+  const activeTrackName = lofiCustomId !== null
+    ? (activeCustomTrack?.name ?? '')
+    : (LOFI_TRACKS[lofiTrack]?.name ?? '');
 
   const handleMascotClick = useCallback(() => {
     // Play satisfying boing sound
@@ -284,8 +331,9 @@ export default function HomeScreen() {
       {/* Record player — bottom-right */}
       <RecordButton
         enabled={lofiEnabled}
-        trackName={LOFI_TRACKS[lofiTrack]?.name ?? ''}
+        trackName={activeTrackName}
         onToggle={() => setLofiEnabled(!lofiEnabled)}
+        ytThumbUrl={ytThumbUrl}
       />
 
       {/* ── Mascot + timer bubble ─────────────────────────────────────── */}

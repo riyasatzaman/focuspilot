@@ -110,6 +110,18 @@ class Mp3Player {
     });
   }
 
+  /** Play audio from a blob/object URL (uploaded file). */
+  playUrl(url: string, volume: number) {
+    this.clearFade();
+    this._vol = volume / 100;
+    this._playing = true;
+    const el = this.getOrCreateAudio();
+    el.loop = true;
+    if (!el.src.endsWith(url)) el.src = url;
+    el.play().catch(() => {});
+    this.fadeIn(this._vol);
+  }
+
   isPlaying() { return this._playing; }
 
   /** Temporarily lower music volume, then restore after `ms` milliseconds. */
@@ -121,3 +133,6 @@ class Mp3Player {
 }
 
 export const lofiPlayer = new Mp3Player();
+
+/** Session-only store for uploaded audio blob URLs (not persisted across refresh). */
+export const customAudioMap = new Map<number, string>(); // trackId → blob URL

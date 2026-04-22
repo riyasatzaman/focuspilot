@@ -379,6 +379,12 @@ body {
   animation: fp-spin 2.4s linear infinite;
 }
 
+/* ── YouTube thumbnail shimmer ─────────────────────────────────────────────── */
+@keyframes fp-shimmer {
+  0%   { background-position: -100px 0; }
+  100% { background-position: 100px 0; }
+}
+
 /* ── Sun slow spin (theme button) ─────────────────────────────────────────── */
 .fp-sun-spin {
   animation: fp-spin 9s linear infinite;
