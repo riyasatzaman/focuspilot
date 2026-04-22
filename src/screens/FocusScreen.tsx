@@ -100,21 +100,31 @@ function FocusMiniStats() {
                 flex: 1,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 transition: 'transform 0.15s',
-                transform: isFlashing ? 'scale(1.12)' : 'scale(1)',
+                transform: isFlashing ? 'scale(1.08)' : 'scale(1)',
               }}
             >
+              {/* Filled colour box */}
               <div style={{
-                fontSize: 20, fontWeight: 'bold',
-                color: STAT_COLORS[k],
-                transition: 'color 0.15s, text-shadow 0.15s',
-                textShadow: isFlashing ? `0 0 10px ${STAT_COLORS[k]}` : 'none',
-                lineHeight: 1,
+                width: '100%',
+                background: STAT_COLORS[k],
+                borderRadius: 6,
+                padding: '6px 2px 4px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                boxShadow: isFlashing ? `0 0 12px ${STAT_COLORS[k]}` : `0 0 0px ${STAT_COLORS[k]}`,
+                transition: 'box-shadow 0.2s',
               }}>
-                {val}
+                <div style={{
+                  fontSize: 20, fontWeight: 'bold',
+                  color: '#fff',
+                  lineHeight: 1,
+                }}>
+                  {val}
+                </div>
+                <div style={{ fontSize: 7, color: 'rgba(255,255,255,0.8)', letterSpacing: 0.4, whiteSpace: 'nowrap', textAlign: 'center' }}>
+                  {STAT_LABELS[k]}
+                </div>
               </div>
-              <div style={{ fontSize: 8, color: isFlashing ? STAT_COLORS[k] : 'var(--text-muted)', letterSpacing: 0.5, transition: 'color 0.15s', whiteSpace: 'nowrap', textAlign: 'center' }}>
-                {STAT_LABELS[k]}
-              </div>
+              {/* Progress bar */}
               <div style={{ width: '100%', height: 3, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', width: `${barPct}%`,
