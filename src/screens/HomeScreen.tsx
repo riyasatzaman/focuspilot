@@ -114,31 +114,32 @@ function RecordButton({ enabled, trackName, onToggle, ytThumbUrl }: {
       {ytThumbUrl && enabled && (
         <div style={{
           position: 'absolute',
-          right: 50,
-          bottom: 4,
+          right: 52,
+          bottom: 3,
           pointerEvents: 'none',
-          animation: 'fp-fadein 0.3s ease forwards',
+          animation: 'fp-thumb-fadein 0.25s ease forwards',
         }}>
           <img
             src={ytThumbUrl}
             alt="Now playing"
             style={{
-              width: 50,
-              height: 34,
+              width: 62,
+              height: 42,
               objectFit: 'cover',
-              borderRadius: 4,
-              border: '1px solid rgba(168,85,247,0.45)',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.55)',
+              borderRadius: 5,
+              border: '1.5px solid #a855f7',
+              boxShadow: '0 0 10px rgba(168,85,247,0.45), 0 2px 10px rgba(0,0,0,0.6)',
               display: 'block',
             }}
           />
-          {/* Subtle "playing" shimmer bar at the bottom of the thumbnail */}
+          {/* ▶ PLAYING badge */}
           <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
-            background: 'linear-gradient(90deg, transparent, #a855f7, transparent)',
-            borderRadius: '0 0 4px 4px',
-            animation: 'fp-shimmer 2s linear infinite',
-          }} />
+            position: 'absolute', bottom: 4, left: 4,
+            fontSize: 6, color: '#fff', letterSpacing: 0.5,
+            background: 'rgba(168,85,247,0.88)',
+            borderRadius: 2, padding: '1px 4px',
+            fontFamily: 'inherit',
+          }}>▶ PLAYING</div>
         </div>
       )}
 
