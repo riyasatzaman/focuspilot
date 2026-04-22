@@ -83,100 +83,151 @@ function ThemeButton({ theme, onToggle }: { theme: string; onToggle: () => void 
   );
 }
 
-// ── Record player button ──────────────────────────────────────────────────────
-function RecordButton({ enabled, trackName, onToggle, ytThumbUrl }: {
+// ── Record player + sliding mini-player ──────────────────────────────────────
+function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
   enabled: boolean;
   trackName: string;
   onToggle: () => void;
+  onNext: () => void;
   ytThumbUrl?: string;
 }) {
-  const [showLabel, setShowLabel] = useState(false);
-  const labelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const collapseRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleClick = () => {
-    onToggle();
-    // Show track name label for 3s on play, hide on stop (only for non-YouTube tracks)
-    if (!enabled && !ytThumbUrl) {
-      setShowLabel(true);
-      if (labelTimerRef.current) clearTimeout(labelTimerRef.current);
-      labelTimerRef.current = setTimeout(() => setShowLabel(false), 3000);
+  // Expand when music starts, collapse when it stops
+  useEffect(() => {
+    if (enabled) {
+      setExpanded(true);
+      scheduleCollapse();
     } else {
-      setShowLabel(false);
-      if (labelTimerRef.current) clearTimeout(labelTimerRef.current);
+      setExpanded(false);
+      clearCollapse();
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled]);
+
+  function clearCollapse() {
+    if (collapseRef.current) { clearTimeout(collapseRef.current); collapseRef.current = null; }
+  }
+  function scheduleCollapse() {
+    clearCollapse();
+    collapseRef.current = setTimeout(() => setExpanded(false), 3000);
+  }
+
+  function handleMouseEnter() {
+    clearCollapse();
+    if (enabled) setExpanded(true);
+  }
+  function handleMouseLeave() {
+    if (enabled) scheduleCollapse();
+  }
+  function handleDiscClick() {
+    onToggle();
+    if (!enabled) { setExpanded(true); scheduleCollapse(); }
+  }
+  function handleControlClick(fn: () => void) {
+    fn();
+    // Reset collapse timer whenever controls are used
+    if (enabled) scheduleCollapse();
+  }
+
+  const PILL_W = 152; // px — inner content width
 
   return (
-    /* Outer anchor — fixed size, never moves */
-    <div data-no-click-sound style={{ position: 'absolute', bottom: 18, right: 18, width: 44, height: 44, zIndex: 10 }}>
-
-      {/* YouTube thumbnail — floats ABOVE the disc, centred on it */}
-      {ytThumbUrl && enabled && (
+    <div
+      data-no-click-sound
+      style={{
+        position: 'absolute', bottom: 18, right: 18,
+        display: 'flex', alignItems: 'center', zIndex: 10,
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* ── Sliding pill ──────────────────────────────────────────── */}
+      {/* Overflow-hidden wrapper drives the slide animation */}
+      <div style={{
+        width: expanded ? PILL_W : 0,
+        overflow: 'hidden',
+        transition: 'width 0.32s cubic-bezier(0.4, 0, 0.2, 1)',
+        flexShrink: 0,
+      }}>
+        {/* Fixed-width inner pill — rounded left, flat right (merges with disc) */}
         <div style={{
-          position: 'absolute',
-          bottom: 50,        /* sits above the 44px disc with a small gap */
-          right: -4,         /* right-align with the disc */
-          width: 80,
-          pointerEvents: 'none',
-          animation: 'fp-thumb-fadein 0.25s ease forwards',
+          width: PILL_W,
+          height: 44,
+          background: 'rgba(12, 8, 26, 0.90)',
+          border: '1.5px solid rgba(168,85,247,0.5)',
+          borderRight: 'none',
+          borderRadius: '22px 0 0 22px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          paddingLeft: 8,
+          paddingRight: 12,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxSizing: 'border-box',
         }}>
-          <img
-            src={ytThumbUrl}
-            alt="Now playing"
-            style={{
-              width: 80,
-              height: 54,
-              objectFit: 'cover',
-              borderRadius: 6,
-              border: '2px solid #a855f7',
-              boxShadow: '0 0 14px rgba(168,85,247,0.5), 0 4px 14px rgba(0,0,0,0.55)',
-              display: 'block',
-            }}
-          />
-          {/* ▶ badge top-left */}
-          <div style={{
-            position: 'absolute', top: 4, left: 4,
-            fontSize: 7, color: '#fff', letterSpacing: 0.5,
-            background: 'rgba(168,85,247,0.9)',
-            borderRadius: 2, padding: '1px 5px',
-            fontFamily: 'inherit',
-          }}>▶</div>
-          {/* Track name below thumbnail */}
-          <div style={{
-            marginTop: 4,
-            fontSize: 7,
-            color: '#a855f7',
-            letterSpacing: 0.5,
-            textAlign: 'right',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            maxWidth: 80,
-          }}>{trackName}</div>
-        </div>
-      )}
 
-      {/* Track name label — shown for built-in / file tracks (not YouTube) */}
-      {showLabel && !ytThumbUrl && (
-        <div style={{
-          position: 'absolute',
-          right: 50,   /* sits just left of the 44px disc */
-          bottom: 6,   /* vertically centred with disc */
-          fontSize: 8, color: '#a855f7', letterSpacing: 1,
-          background: 'var(--bg-panel)', border: '1px solid rgba(168,85,247,0.3)',
-          borderRadius: 3, padding: '3px 7px', whiteSpace: 'nowrap',
-          animation: 'fp-fadein 0.18s ease forwards',
-          pointerEvents: 'none',
-        }}>
-          {trackName}
-        </div>
-      )}
+          {/* Circular album art / thumbnail */}
+          <div style={{
+            width: 30, height: 30, borderRadius: '50%',
+            overflow: 'hidden', flexShrink: 0,
+            border: '1.5px solid rgba(168,85,247,0.7)',
+            background: 'rgba(168,85,247,0.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {ytThumbUrl
+              ? <img src={ytThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : <span style={{ fontSize: 13, color: '#a855f7' }}>♪</span>
+            }
+          </div>
 
-      {/* The record disc — always at the same position */}
+          {/* Track name */}
+          <div style={{
+            flex: 1, minWidth: 0,
+            fontSize: 8, color: 'rgba(200,160,255,0.95)', letterSpacing: 0.5,
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+          }}>
+            {trackName}
+          </div>
+
+          {/* Controls: pause/play + next */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 0, flexShrink: 0 }}>
+            <button
+              onClick={() => handleControlClick(onToggle)}
+              style={{
+                background: 'transparent', border: 'none',
+                color: '#a855f7', fontSize: 14, lineHeight: 1,
+                cursor: 'pointer', padding: '4px 6px',
+              }}
+              title={enabled ? 'Pause' : 'Play'}
+            >{enabled ? '⏸' : '▶'}</button>
+            <button
+              onClick={() => handleControlClick(onNext)}
+              style={{
+                background: 'transparent', border: 'none',
+                color: 'rgba(168,85,247,0.65)', fontSize: 12, lineHeight: 1,
+                cursor: 'pointer', padding: '4px 6px',
+              }}
+              title="Next track"
+            >⏭</button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Record disc (always visible) ─────────────────────────── */}
       <button
-        onClick={handleClick}
+        onClick={handleDiscClick}
         title={enabled ? 'Stop music' : 'Play lo-fi music'}
-        style={{ background: 'none', border: 'none', padding: 3, cursor: 'pointer', display: 'flex' }}
+        style={{
+          background: 'none', border: 'none', padding: 3,
+          cursor: 'pointer', display: 'flex', flexShrink: 0,
+          /* Left edge of disc merges with pill when expanded */
+          borderLeft: expanded ? '1.5px solid rgba(168,85,247,0.5)' : 'none',
+          marginLeft: expanded ? -1 : 0,
+          transition: 'border-left 0.32s, margin-left 0.32s',
+        }}
       >
         <svg
           width={38} height={38} viewBox="0 0 38 38"
@@ -292,7 +343,7 @@ export default function HomeScreen() {
   const dialogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const duckDivRef = useRef<HTMLDivElement>(null);
 
-  const { xp, level, points, stats, setScreen, toggleTheme, theme, sounds, volume, rewards, addReward, deleteReward, redeemReward, lofiEnabled, setLofiEnabled, lofiTrack, pomoRunning, pomoSecs, pomoPhase, customTracks, lofiCustomId } = useStore();
+  const { xp, level, points, stats, setScreen, toggleTheme, theme, sounds, volume, rewards, addReward, deleteReward, redeemReward, lofiEnabled, setLofiEnabled, lofiTrack, setLofiTrack, pomoRunning, pomoSecs, pomoPhase, customTracks, lofiCustomId, setLofiCustomId } = useStore();
   const info = xpInfo(xp);
 
   // Determine active custom track info for the record button
@@ -347,6 +398,12 @@ export default function HomeScreen() {
         enabled={lofiEnabled}
         trackName={activeTrackName}
         onToggle={() => setLofiEnabled(!lofiEnabled)}
+        onNext={() => {
+          const next = (lofiTrack + 1) % LOFI_TRACKS.length;
+          setLofiTrack(next);
+          setLofiCustomId(null);   // always returns to built-in tracks
+          if (!lofiEnabled) setLofiEnabled(true);
+        }}
         ytThumbUrl={ytThumbUrl}
       />
 
