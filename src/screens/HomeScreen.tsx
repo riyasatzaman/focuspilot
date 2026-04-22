@@ -132,6 +132,7 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        className="fp-pill-bg"
         style={{
           position: 'absolute',
           right: 44,
@@ -139,10 +140,10 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
           height: 44,
           width: expanded ? PILL_W : 0,
           overflow: 'hidden',
-          background: 'rgba(10,6,22,0.95)',
-          borderRadius: '22px 0 0 22px',
+          /* Full capsule — right rounded corner hides behind the disc for a seamless join */
+          borderRadius: 22,
           boxShadow: expanded
-            ? 'inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 20px rgba(0,0,0,0.35)'
+            ? 'inset 0 0 0 1px rgba(130,80,220,0.18), 0 6px 28px rgba(0,0,0,0.38)'
             : 'none',
           /* Right-align so disc-side content (controls) reveals first */
           display: 'flex',
@@ -162,25 +163,24 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
           paddingLeft: 12,
           paddingRight: 10,
           opacity: expanded ? 1 : 0,
-          transition: 'opacity 0.15s',
+          transition: 'opacity 0.18s',
         }}>
           {/* Circular album art */}
-          <div style={{
+          <div className="fp-pill-art-bg" style={{
             width: 28, height: 28, borderRadius: '50%',
             overflow: 'hidden', flexShrink: 0,
-            background: 'rgba(168,85,247,0.10)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             {ytThumbUrl
               ? <img src={ytThumbUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <span style={{ fontSize: 12, color: 'rgba(168,85,247,0.65)' }}>♪</span>
+              : <span style={{ fontSize: 12, color: 'rgba(168,85,247,0.6)' }}>♪</span>
             }
           </div>
 
           {/* Track name */}
-          <div style={{
+          <div className="fp-pill-track" style={{
             flex: 1, minWidth: 0,
-            fontSize: 8, color: 'rgba(210,175,255,0.82)', letterSpacing: 0.6,
+            fontSize: 8, letterSpacing: 0.6,
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>
             {trackName}
@@ -189,21 +189,13 @@ function RecordButton({ enabled, trackName, onToggle, onNext, ytThumbUrl }: {
           {/* ⏸/▶  ⏭ */}
           <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <button
+              className="fp-pill-btn-play"
               onClick={onToggle}
-              style={{
-                background: 'transparent', border: 'none',
-                color: 'rgba(180,130,255,0.9)', fontSize: 13, lineHeight: 1,
-                cursor: 'pointer', padding: '4px 7px',
-              }}
               title={enabled ? 'Pause' : 'Play'}
             >{enabled ? '⏸' : '▶'}</button>
             <button
+              className="fp-pill-btn-next"
               onClick={onNext}
-              style={{
-                background: 'transparent', border: 'none',
-                color: 'rgba(168,85,247,0.5)', fontSize: 11, lineHeight: 1,
-                cursor: 'pointer', padding: '4px 6px',
-              }}
               title="Next track"
             >⏭</button>
           </div>
